@@ -1,0 +1,14 @@
+[90m= [39m{#7719
+    +"[1mid[22m": [35m3[39m,
+    +"[1mname[22m": [32m"[39m[32mSara Bennani[39m[32m"[39m,
+    +"[1memail[22m": [32m"[39m[32mcustomer@example.com[39m[32m"[39m,
+    +"[1memail_verified_at[22m": [32m"[39m[32m2026-05-04 14:14:53[39m[32m"[39m,
+    +"[1mpassword[22m": [32m"[39m\$[32m2y[39m\$[32m12[39m\$[32mGBELIZhQ.rJgAqy3ckXuOOf/WKFvs9zaRXpbCUveGMkYqtJ8PdqRG[39m[32m"[39m,
+    +"[1mremember_token[22m": [36mnull[39m,
+    +"[1mcreated_at[22m": [32m"[39m[32m2026-05-04 14:14:53[39m[32m"[39m,
+    +"[1mupdated_at[22m": [32m"[39m[32m2026-05-04 14:14:53[39m[32m"[39m,
+    +"[1mtwo_factor_secret[22m": [36mnull[39m,
+    +"[1mtwo_factor_recovery_codes[22m": [36mnull[39m,
+    +"[1mtwo_factor_confirmed_at[22m": [36mnull[39m,
+    +"[1mphone[22m": [36mnull[39m,
+  }

@@ -1,0 +1,552 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
+
+/* ── Keyframes ── */
+@keyframes cim-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px)
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0)
+  }
+}
+
+@keyframes cim-fade-in {
+  from {
+    opacity: 0
+  }
+
+  to {
+    opacity: 1
+  }
+}
+
+@keyframes cim-shimmer {
+  0% {
+    background-position: -200% center
+  }
+
+  100% {
+    background-position: 200% center
+  }
+}
+
+@keyframes cim-glow-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 30px rgba(212, 162, 60, 0.08), 0 0 60px rgba(10, 100, 116, 0.05)
+  }
+
+  50% {
+    box-shadow: 0 0 50px rgba(212, 162, 60, 0.18), 0 0 80px rgba(10, 100, 116, 0.1)
+  }
+}
+
+@keyframes cim-border-glow {
+
+  0%,
+  100% {
+    border-color: rgba(212, 162, 60, 0.15)
+  }
+
+  50% {
+    border-color: rgba(212, 162, 60, 0.35)
+  }
+}
+
+/* ── Root ── */
+.cim-root {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #061F39;
+}
+
+/* ── 3D Canvas Layer ── */
+.cim-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* ── Overlay (readability + atmosphere) ── */
+.cim-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 50%, rgba(6, 31, 57, 0.1) 0%, rgba(6, 31, 57, 0.55) 100%),
+    linear-gradient(180deg, rgba(6, 31, 57, 0.0) 0%, rgba(6, 31, 57, 0.3) 100%);
+  pointer-events: none;
+}
+
+/* ── Card Container (centers card) ── */
+.cim-center {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* ── Glass Login Card ── */
+.cim-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 44px 40px 36px;
+  background: rgba(6, 31, 57, 0.45);
+  backdrop-filter: blur(28px) saturate(1.4);
+  -webkit-backdrop-filter: blur(28px) saturate(1.4);
+  border: 1px solid rgba(212, 162, 60, 0.18);
+  border-radius: 24px;
+  box-shadow:
+    0 32px 80px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+  animation: cim-fade-up 0.9s ease-out 0.15s both, cim-glow-pulse 5s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Gold accent line at top */
+.cim-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #D4A23C, transparent);
+  border-radius: 2px;
+}
+
+/* ── Logo ── */
+.cim-logo {
+  text-align: center;
+  margin-bottom: 28px;
+  animation: cim-fade-up 0.7s ease-out 0.3s both;
+}
+
+.cim-logo-mark {
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 14px;
+  background: linear-gradient(135deg, #082F54 0%, #0A6474 100%);
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid rgba(212, 162, 60, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(212, 162, 60, 0.08);
+  animation: cim-border-glow 4s ease-in-out infinite;
+  position: relative;
+}
+
+.cim-logo-mark svg {
+  width: 34px;
+  height: 34px;
+}
+
+.cim-logo-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.14em;
+}
+
+.cim-logo-sub {
+  font-size: 0.65rem;
+  color: rgba(212, 162, 60, 0.8);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* ── Header ── */
+.cim-hdr {
+  text-align: center;
+  margin-bottom: 28px;
+  animation: cim-fade-up 0.7s ease-out 0.45s both;
+}
+
+.cim-hdr h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.45rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 6px;
+}
+
+.cim-hdr p {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+/* ── Form ── */
+.cim-form {
+  animation: cim-fade-up 0.7s ease-out 0.55s both;
+}
+
+.cim-field {
+  margin-bottom: 18px;
+}
+
+.cim-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 6px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cim-input-wrap {
+  position: relative;
+}
+
+.cim-input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.cim-input-icon svg {
+  width: 17px;
+  height: 17px;
+  color: rgba(212, 162, 60, 0.6);
+  stroke: currentColor;
+}
+
+.cim-input {
+  width: 100%;
+  padding: 13px 14px 13px 42px;
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(209, 217, 218, 0.15);
+  border-radius: 12px;
+  outline: none;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.cim-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.cim-input:hover {
+  border-color: rgba(10, 100, 116, 0.5);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.cim-input:focus {
+  border-color: #D4A23C;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(212, 162, 60, 0.12), 0 0 20px rgba(212, 162, 60, 0.06);
+}
+
+/* Password toggle */
+.cim-pw-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  z-index: 1;
+  transition: color 0.2s;
+}
+
+.cim-pw-toggle svg {
+  width: 17px;
+  height: 17px;
+  color: rgba(255, 255, 255, 0.4);
+  stroke: currentColor;
+}
+
+.cim-pw-toggle:hover svg {
+  color: #D4A23C;
+}
+
+/* ── Remember / Forgot ── */
+.cim-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+.cim-remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.cim-remember input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: #D4A23C;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.cim-remember span {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.cim-forgot {
+  font-size: 0.8rem;
+  color: #D4A23C;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.25s;
+}
+
+.cim-forgot:hover {
+  color: #e8ba55;
+  text-shadow: 0 0 12px rgba(212, 162, 60, 0.3);
+}
+
+/* ── Login Button ── */
+.cim-btn {
+  width: 100%;
+  padding: 14px 24px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.06em;
+  color: #ffffff;
+  background: linear-gradient(135deg, #082F54 0%, #0A6474 60%, #0d7a8c 100%);
+  border: 1.5px solid rgba(212, 162, 60, 0.25);
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.35s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(212, 162, 60, 0);
+}
+
+.cim-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(212, 162, 60, 0.2) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: cim-shimmer 3.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.cim-btn:hover:not(:disabled) {
+  border-color: rgba(212, 162, 60, 0.6);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 30px rgba(212, 162, 60, 0.15);
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #0A6474 0%, #082F54 60%, #0d3a6c 100%);
+}
+
+.cim-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.cim-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── Biometric Button ── */
+.cim-btn-bio {
+  width: 100%;
+  padding: 11px 24px;
+  margin-top: 10px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(209, 217, 218, 0.12);
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.25s;
+}
+
+.cim-btn-bio svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+}
+
+.cim-btn-bio:hover {
+  border-color: rgba(10, 100, 116, 0.4);
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ── Signup ── */
+.cim-signup {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  animation: cim-fade-up 0.7s ease-out 0.7s both;
+}
+
+.cim-signup a {
+  color: #D4A23C;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.25s;
+}
+
+.cim-signup a:hover {
+  color: #e8ba55;
+  text-shadow: 0 0 10px rgba(212, 162, 60, 0.25);
+}
+
+/* ── Trust ── */
+.cim-trust {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  animation: cim-fade-up 0.7s ease-out 0.85s both;
+}
+
+.cim-trust-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.cim-trust-item svg {
+  width: 12px;
+  height: 12px;
+  color: rgba(212, 162, 60, 0.5);
+  stroke: currentColor;
+}
+
+/* ── Status ── */
+.cim-status {
+  text-align: center;
+  font-size: 0.82rem;
+  color: #D4A23C;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  background: rgba(212, 162, 60, 0.08);
+  border-radius: 10px;
+  border: 1px solid rgba(212, 162, 60, 0.15);
+}
+
+.cim-error {
+  font-size: 0.78rem;
+  color: #f0705a;
+  margin-top: 5px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .cim-card {
+    padding: 32px 24px 28px;
+    border-radius: 20px;
+  }
+
+  .cim-logo-mark {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+  }
+
+  .cim-logo-mark svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .cim-hdr h1 {
+    font-size: 1.2rem;
+  }
+
+  .cim-trust {
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (max-height: 700px) {
+  .cim-card {
+    padding: 28px 32px 24px;
+  }
+
+  .cim-logo {
+    margin-bottom: 16px;
+  }
+
+  .cim-logo-mark {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 8px;
+  }
+
+  .cim-hdr {
+    margin-bottom: 18px;
+  }
+
+  .cim-field {
+    margin-bottom: 12px;
+  }
+
+  .cim-trust {
+    margin-top: 16px;
+    padding-top: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .cim-card,
+  .cim-logo,
+  .cim-hdr,
+  .cim-form,
+  .cim-signup,
+  .cim-trust {
+    animation: none !important;
+  }
+
+  .cim-btn::before {
+    animation: none !important;
+  }
+}

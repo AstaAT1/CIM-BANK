@@ -1,0 +1,15 @@
+[90m= [39m[34;4mIlluminate\Support\Collection[39;24m {#7686
+    [34mall[39m: [
+      {#7690
+        +"[1mid[22m": [35m1[39m,
+        +"[1maccount_opening_request_id[22m": [35m1[39m,
+        +"[1mbranch_id[22m": [35m1[39m,
+        +"[1mcustomer_id[22m": [35m3[39m,
+        +"[1mscheduled_at[22m": [32m"[39m[32m2026-05-07 10:30:00[39m[32m"[39m,
+        +"[1mstatus[22m": [32m"[39m[32mscheduled[39m[32m"[39m,
+        +"[1mnotes[22m": [32m"[39m[32mBring original CIN and proof of address for final verification.[39m[32m"[39m,
+        +"[1mcreated_at[22m": [32m"[39m[32m2026-05-04 14:14:53[39m[32m"[39m,
+        +"[1mupdated_at[22m": [32m"[39m[32m2026-05-04 14:14:53[39m[32m"[39m,
+      },
+    ],
+  }
