@@ -1,28 +1,32 @@
 import { Head, router } from '@inertiajs/react';
-import { useCallback, useState } from 'react';
+import {
+    ArrowLeft,
+    ArrowRight,
+    BadgeCheck,
+    BriefcaseBusiness,
+    Building2,
+    CalendarCheck,
+    CheckCircle2,
+    FileImage,
+    IdCard,
+    Landmark,
+    LockKeyhole,
+    Mail,
+    MapPin,
+    Phone,
+    ShieldCheck,
+    Sparkles,
+    UploadCloud,
+    UserRound,
+} from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { ComponentType, ReactNode } from 'react';
+import { motion } from 'motion/react';
+import gsap from 'gsap';
 import TextLink from '@/components/text-link';
 import { login } from '@/routes';
+import background from '../customer/images/CIM.png';
 
-/* ── CIM Palette ── */
-const CIM = {
-    primary: '#082F54',
-    secondary: '#0A6474',
-    accent: '#D4A23C',
-    dark: '#061F39',
-    bg: '#F7F8FA',
-    white: '#FFFFFF',
-    border: '#D1D9DA',
-};
-
-/* ── Step indicator labels ── */
-const STEPS = [
-    { label: 'Contact Information', icon: '📧' },
-    { label: 'Personal Information', icon: '🔒' },
-    { label: 'Identity Verification', icon: '🪪' },
-    { label: 'Appointment Booking', icon: '📅' },
-];
-
-/* ── Types ── */
 type FormData = {
     name: string;
     email: string;
@@ -46,7 +50,41 @@ type Branch = {
     city: string;
 };
 
+const steps = [
+    {
+        number: 1,
+        label: 'Contact',
+        title: 'Contact information',
+        description: 'Start with your name, email and phone number.',
+        icon: Mail,
+    },
+    {
+        number: 2,
+        label: 'Security',
+        title: 'Personal information',
+        description: 'Create your password and add your address details.',
+        icon: LockKeyhole,
+    },
+    {
+        number: 3,
+        label: 'Identity',
+        title: 'Identity verification',
+        description: 'Upload your CIN and choose your preferred branch.',
+        icon: IdCard,
+    },
+];
+
+const benefits = [
+    'Secure onboarding',
+    'Branch appointment ready',
+    'CIN verification',
+    'Digital banking access',
+    'Machrou3i support',
+    'ATM locator services',
+];
+
 export default function Register({ branches }: { branches?: Branch[] }) {
+    const pageRef = useRef<HTMLDivElement | null>(null);
     const [step, setStep] = useState(1);
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState<ValidationErrors>({});
@@ -65,52 +103,138 @@ export default function Register({ branches }: { branches?: Branch[] }) {
         branch_id: '',
     });
 
-    const updateField = useCallback((field: keyof FormData, value: string | File | null) => {
-        setForm((prev) => ({ ...prev, [field]: value }));
-        setErrors((prev) => {
-            const next = { ...prev };
-            delete next[field];
-            return next;
-        });
+    const currentStep = steps[step - 1];
+
+    useEffect(() => {
+        if (!pageRef.current) {
+            return undefined;
+        }
+
+        const ctx = gsap.context(() => {
+            gsap.fromTo(
+                '.register-reveal',
+                { autoAlpha: 0, y: 22 },
+                {
+                    autoAlpha: 1,
+                    y: 0,
+                    duration: 0.68,
+                    stagger: 0.065,
+                    ease: 'power3.out',
+                },
+            );
+
+            gsap.to('.register-orb', {
+                x: 18,
+                y: -14,
+                scale: 1.06,
+                duration: 5.2,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut',
+            });
+        }, pageRef);
+
+        return () => ctx.revert();
     }, []);
 
-    /* ── Step validation (client-side) ── */
+    const updateField = useCallback(
+        (field: keyof FormData, value: string | File | null) => {
+            setForm((prev) => ({ ...prev, [field]: value }));
+            setErrors((prev) => {
+                const next = { ...prev };
+                delete next[field];
+
+                return next;
+            });
+        },
+        [],
+    );
+
     const validateStep = (s: number): boolean => {
-        const errs: ValidationErrors = {};
+        const nextErrors: ValidationErrors = {};
+
         if (s === 1) {
-            if (!form.name.trim()) errs.name = 'Full name is required.';
-            if (!form.email.trim()) errs.email = 'Email is required.';
-            else if (!/^\S+@\S+\.\S+$/.test(form.email)) errs.email = 'Invalid email address.';
-            if (!form.phone.trim()) errs.phone = 'Phone number is required.';
-        } else if (s === 2) {
-            if (!form.password) errs.password = 'Password is required.';
-            else if (form.password.length < 8) errs.password = 'Password must be at least 8 characters.';
-            if (form.password !== form.password_confirmation) errs.password_confirmation = 'Passwords do not match.';
-            if (!form.date_of_birth) errs.date_of_birth = 'Date of birth is required.';
-            if (!form.address.trim()) errs.address = 'Address is required.';
-        } else if (s === 3) {
-            if (!form.cin.trim()) errs.cin = 'CIN number is required.';
-            if (!form.cin_front) errs.cin_front = 'CIN front image is required.';
-            if (!form.cin_back) errs.cin_back = 'CIN back image is required.';
-            if (!form.profession.trim()) errs.profession = 'Profession is required.';
-            if (!form.branch_id) errs.branch_id = 'Please select a branch.';
+            if (!form.name.trim()) {
+                nextErrors.name = 'Full name is required.';
+            }
+
+            if (!form.email.trim()) {
+                nextErrors.email = 'Email is required.';
+            } else if (!/^\S+@\S+\.\S+$/.test(form.email)) {
+                nextErrors.email = 'Invalid email address.';
+            }
+
+            if (!form.phone.trim()) {
+                nextErrors.phone = 'Phone number is required.';
+            }
         }
-        setErrors(errs);
-        return Object.keys(errs).length === 0;
+
+        if (s === 2) {
+            if (!form.password) {
+                nextErrors.password = 'Password is required.';
+            } else if (form.password.length < 8) {
+                nextErrors.password = 'Password must be at least 8 characters.';
+            }
+
+            if (form.password !== form.password_confirmation) {
+                nextErrors.password_confirmation = 'Passwords do not match.';
+            }
+
+            if (!form.date_of_birth) {
+                nextErrors.date_of_birth = 'Date of birth is required.';
+            }
+
+            if (!form.address.trim()) {
+                nextErrors.address = 'Address is required.';
+            }
+        }
+
+        if (s === 3) {
+            if (!form.cin.trim()) {
+                nextErrors.cin = 'CIN number is required.';
+            }
+
+            if (!form.cin_front) {
+                nextErrors.cin_front = 'CIN front image is required.';
+            }
+
+            if (!form.cin_back) {
+                nextErrors.cin_back = 'CIN back image is required.';
+            }
+
+            if (!form.profession.trim()) {
+                nextErrors.profession = 'Profession is required.';
+            }
+
+            if (!form.branch_id) {
+                nextErrors.branch_id = 'Please select a branch.';
+            }
+        }
+
+        setErrors(nextErrors);
+
+        return Object.keys(nextErrors).length === 0;
     };
 
     const nextStep = () => {
-        if (validateStep(step)) setStep((s) => Math.min(s + 1, 3));
+        if (validateStep(step)) {
+            setStep((value) => Math.min(value + 1, 3));
+        }
     };
 
-    const prevStep = () => setStep((s) => Math.max(s - 1, 1));
+    const prevStep = () => setStep((value) => Math.max(value - 1, 1));
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!validateStep(3)) return;
+    const handleSubmit = (event: React.FormEvent) => {
+        event.preventDefault();
+
+        if (!validateStep(3)) {
+            return;
+        }
 
         setProcessing(true);
+
         const data = new FormData();
+
         Object.entries(form).forEach(([key, value]) => {
             if (value !== null && value !== undefined) {
                 data.append(key, value as string | Blob);
@@ -121,13 +245,23 @@ export default function Register({ branches }: { branches?: Branch[] }) {
             forceFormData: true,
             onError: (serverErrors) => {
                 setErrors(serverErrors as ValidationErrors);
-                // Navigate to the step containing the first error
+
                 const step1Fields = ['name', 'email', 'phone'];
-                const step2Fields = ['password', 'password_confirmation', 'date_of_birth', 'address'];
+                const step2Fields = [
+                    'password',
+                    'password_confirmation',
+                    'date_of_birth',
+                    'address',
+                ];
                 const errorKeys = Object.keys(serverErrors);
-                if (errorKeys.some((k) => step1Fields.includes(k))) setStep(1);
-                else if (errorKeys.some((k) => step2Fields.includes(k))) setStep(2);
-                else setStep(3);
+
+                if (errorKeys.some((key) => step1Fields.includes(key))) {
+                    setStep(1);
+                } else if (errorKeys.some((key) => step2Fields.includes(key))) {
+                    setStep(2);
+                } else {
+                    setStep(3);
+                }
             },
             onFinish: () => setProcessing(false),
         });
@@ -136,398 +270,467 @@ export default function Register({ branches }: { branches?: Branch[] }) {
     return (
         <>
             <Head title="Open an Account — CIM" />
-            <div className="cim-root" style={{ position: 'fixed', inset: 0, overflow: 'auto', background: CIM.dark }}>
-                {/* Background gradient */}
-                <div
-                    style={{
-                        position: 'fixed',
-                        inset: 0,
-                        zIndex: 0,
-                        background: `radial-gradient(ellipse 80% 60% at 50% 30%, ${CIM.primary}40 0%, ${CIM.dark} 100%)`,
-                    }}
-                />
 
-                <div
-                    style={{
-                        position: 'relative',
-                        zIndex: 10,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        minHeight: '100vh',
-                        padding: '32px 16px',
-                    }}
-                >
-                    {/* Logo */}
-                    <div style={{ textAlign: 'center', marginBottom: 24 }}>
-                        <div
-                            style={{
-                                fontFamily: "'Playfair Display', serif",
-                                fontSize: '1.5rem',
-                                fontWeight: 600,
-                                color: CIM.white,
-                                letterSpacing: '0.12em',
-                            }}
-                        >
-                            CIM
-                        </div>
-                        <div
-                            style={{
-                                fontSize: '0.65rem',
-                                color: CIM.accent,
-                                letterSpacing: '0.18em',
-                                textTransform: 'uppercase' as const,
-                                fontWeight: 500,
-                            }}
-                        >
-                            Credit Intelligence Mizan
-                        </div>
-                    </div>
+            <main
+                ref={pageRef}
+                className="relative h-svh overflow-hidden bg-[#061F39] text-white"
+            >
+                <div className="absolute inset-0">
+                    <img
+                        src={background}
+                        alt="CIM Bank"
+                        className="h-full w-full object-cover"
+                    />
 
-                    {/* Step Indicator */}
-                    <StepIndicator current={step} />
+                    <div className="absolute inset-0 bg-[#061F39]/60" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#061F39]/94 via-[#061F39]/66 to-[#061F39]/30" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#061F39]/78 via-transparent to-[#061F39]/20" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(212,162,60,0.25),transparent_28%),radial-gradient(circle_at_88%_18%,rgba(10,100,116,0.22),transparent_34%)]" />
+                </div>
 
-                    {/* Card */}
-                    <div
-                        style={{
-                            width: '100%',
-                            maxWidth: 520,
-                            background: 'rgba(6, 31, 57, 0.5)',
-                            backdropFilter: 'blur(28px)',
-                            border: `1px solid rgba(212, 162, 60, 0.18)`,
-                            borderRadius: 24,
-                            padding: '40px 36px 32px',
-                            boxShadow: '0 32px 80px rgba(0,0,0,0.4)',
-                            position: 'relative',
-                            overflow: 'hidden',
-                        }}
-                    >
-                        {/* Gold accent line */}
-                        <div
-                            style={{
-                                position: 'absolute',
-                                top: 0,
-                                left: '50%',
-                                transform: 'translateX(-50%)',
-                                width: '60%',
-                                height: 2,
-                                background: `linear-gradient(90deg, transparent, ${CIM.accent}, transparent)`,
-                            }}
+                <div className="register-orb pointer-events-none absolute -top-24 right-10 h-80 w-80 rounded-full bg-[#D4A23C]/18 blur-3xl" />
+                <div className="register-orb pointer-events-none absolute bottom-10 -left-28 h-96 w-96 rounded-full bg-[#0A6474]/24 blur-3xl" />
+
+                <div className="relative z-10 grid h-full w-full items-center px-4 py-4 sm:px-6 lg:grid-cols-[1fr_520px] lg:px-10 xl:px-16">
+                    <section className="register-reveal hidden max-w-3xl lg:block">
+                        <img
+                            src="/logo_twil.png"
+                            alt="CIM Bank"
+                            className="h-16 w-auto max-w-[270px] object-contain drop-shadow-2xl"
                         />
 
-                        {/* Header */}
-                        <div style={{ textAlign: 'center', marginBottom: 28 }}>
-                            <h1
-                                style={{
-                                    fontFamily: "'Playfair Display', serif",
-                                    fontSize: '1.35rem',
-                                    fontWeight: 600,
-                                    color: CIM.white,
-                                    margin: '0 0 6px',
-                                }}
-                            >
-                                {step === 1 && 'Contact Information'}
-                                {step === 2 && 'Personal Information'}
-                                {step === 3 && 'Identity Verification'}
-                            </h1>
-                            <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
-                                {step === 1 && 'Enter your contact details to get started'}
-                                {step === 2 && 'Set up your password and personal details'}
-                                {step === 3 && 'Upload your identification documents'}
-                            </p>
+                        <div className="mt-10 inline-flex items-center gap-2 rounded-full border border-[#D4A23C]/35 bg-[#D4A23C]/12 px-4 py-2 text-xs font-bold tracking-[0.18em] text-[#F6D27B] uppercase backdrop-blur-xl">
+                            <Sparkles className="h-4 w-4" />
+                            Digital onboarding
                         </div>
 
-                        <form onSubmit={handleSubmit}>
-                            {/* Step 1 */}
-                            {step === 1 && (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                                    <CimField label="Full Name" error={errors.name}>
-                                        <CimInput
-                                            type="text"
-                                            placeholder="Mohamed Amine"
-                                            value={form.name}
-                                            onChange={(e) => updateField('name', e.target.value)}
-                                            autoFocus
-                                        />
-                                    </CimField>
-                                    <CimField label="Email Address" error={errors.email}>
-                                        <CimInput
-                                            type="email"
-                                            placeholder="email@example.com"
-                                            value={form.email}
-                                            onChange={(e) => updateField('email', e.target.value)}
-                                        />
-                                    </CimField>
-                                    <CimField label="Phone Number" error={errors.phone}>
-                                        <CimInput
-                                            type="tel"
-                                            placeholder="+212 6XX XXX XXX"
-                                            value={form.phone}
-                                            onChange={(e) => updateField('phone', e.target.value)}
-                                        />
-                                    </CimField>
-                                </div>
-                            )}
+                        <h1 className="mt-6 max-w-3xl text-5xl font-semibold leading-[0.95] tracking-tight text-white xl:text-6xl">
+                            Open your CIM account with confidence.
+                        </h1>
 
-                            {/* Step 2 */}
-                            {step === 2 && (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                                    <CimField label="Password" error={errors.password}>
-                                        <CimInput
-                                            type="password"
-                                            placeholder="Min. 8 characters"
-                                            value={form.password}
-                                            onChange={(e) => updateField('password', e.target.value)}
-                                            autoFocus
-                                        />
-                                    </CimField>
-                                    <CimField label="Confirm Password" error={errors.password_confirmation}>
-                                        <CimInput
-                                            type="password"
-                                            placeholder="Re-enter your password"
-                                            value={form.password_confirmation}
-                                            onChange={(e) => updateField('password_confirmation', e.target.value)}
-                                        />
-                                    </CimField>
-                                    <CimField label="Date of Birth" error={errors.date_of_birth}>
-                                        <CimInput
-                                            type="date"
-                                            value={form.date_of_birth}
-                                            onChange={(e) => updateField('date_of_birth', e.target.value)}
-                                        />
-                                    </CimField>
-                                    <CimField label="Address" error={errors.address}>
-                                        <CimInput
-                                            type="text"
-                                            placeholder="Street, City, Morocco"
-                                            value={form.address}
-                                            onChange={(e) => updateField('address', e.target.value)}
-                                        />
-                                    </CimField>
-                                </div>
-                            )}
+                        <p className="mt-5 max-w-xl text-base leading-8 text-white/72">
+                            Submit your contact details, verify your identity,
+                            choose a branch, and start your secure CIM banking
+                            journey.
+                        </p>
 
-                            {/* Step 3 */}
-                            {step === 3 && (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                                    <CimField label="CIN Number" error={errors.cin}>
-                                        <CimInput
-                                            type="text"
-                                            placeholder="e.g. AB123456"
-                                            value={form.cin}
-                                            onChange={(e) => updateField('cin', e.target.value)}
-                                            autoFocus
-                                        />
-                                    </CimField>
-                                    <CimField label="CIN Front Image" error={errors.cin_front}>
-                                        <CimFileInput
-                                            accept="image/*"
-                                            file={form.cin_front}
-                                            onChange={(f) => updateField('cin_front', f)}
-                                        />
-                                    </CimField>
-                                    <CimField label="CIN Back Image" error={errors.cin_back}>
-                                        <CimFileInput
-                                            accept="image/*"
-                                            file={form.cin_back}
-                                            onChange={(f) => updateField('cin_back', f)}
-                                        />
-                                    </CimField>
-                                    <CimField label="Profession / Job" error={errors.profession}>
-                                        <CimInput
-                                            type="text"
-                                            placeholder="e.g. Software Engineer"
-                                            value={form.profession}
-                                            onChange={(e) => updateField('profession', e.target.value)}
-                                        />
-                                    </CimField>
-                                    <CimField label="Preferred Branch" error={errors.branch_id}>
-                                        <CimSelect
-                                            value={form.branch_id}
-                                            onChange={(e) => updateField('branch_id', e.target.value)}
-                                            options={(branches ?? []).map((b) => ({
-                                                value: String(b.id),
-                                                label: `${b.name} — ${b.city}`,
-                                            }))}
-                                            placeholder="Select a branch"
-                                        />
-                                    </CimField>
-                                </div>
-                            )}
+                        <div className="mt-8 flex flex-wrap gap-2">
+                            {benefits.map((item) => (
+                                <span
+                                    key={item}
+                                    className="rounded-full border border-white/12 bg-white/10 px-4 py-2 text-xs font-semibold text-white/82 backdrop-blur-xl"
+                                >
+                                    {item}
+                                </span>
+                            ))}
+                        </div>
 
-                            {/* Navigation Buttons */}
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    gap: 12,
-                                    marginTop: 24,
-                                    flexDirection: step === 1 ? 'column' : 'row',
-                                }}
-                            >
-                                {step > 1 && (
-                                    <button type="button" onClick={prevStep} className="cim-btn-secondary">
-                                        Back
-                                    </button>
-                                )}
-                                {step < 3 && (
-                                    <button type="button" onClick={nextStep} className="cim-btn-primary" style={{ flex: 1 }}>
-                                        Next
-                                    </button>
-                                )}
-                                {step === 3 && (
-                                    <button
-                                        type="submit"
-                                        disabled={processing}
-                                        className="cim-btn-primary"
-                                        style={{ flex: 1, opacity: processing ? 0.6 : 1 }}
-                                    >
-                                        {processing ? 'Submitting...' : 'Submit Request'}
-                                    </button>
-                                )}
-                            </div>
-                        </form>
+                        <div className="mt-10 grid max-w-xl grid-cols-3 gap-3">
+                            <TrustCard
+                                icon={ShieldCheck}
+                                title="Secure"
+                                text="Protected submission"
+                            />
+                            <TrustCard
+                                icon={CalendarCheck}
+                                title="Branch"
+                                text="Appointment ready"
+                            />
+                            <TrustCard
+                                icon={Landmark}
+                                title="CIM"
+                                text="Bank review"
+                            />
+                        </div>
+                    </section>
 
-                        {/* Login link */}
-                        <div
-                            style={{
-                                textAlign: 'center',
-                                marginTop: 20,
-                                fontSize: '0.8rem',
-                                color: 'rgba(255,255,255,0.4)',
-                            }}
+                    <section className="register-reveal mx-auto w-full max-w-[520px]">
+                        <div className="mb-3 flex justify-center lg:hidden">
+                            <img
+                                src="/logo_twil.png"
+                                alt="CIM Bank"
+                                className="h-11 w-auto max-w-[220px] object-contain drop-shadow-2xl"
+                            />
+                        </div>
+
+                        <motion.div
+                            className="overflow-hidden rounded-[1.75rem] border border-white/14 bg-white/[0.13] shadow-[0_30px_100px_rgba(0,0,0,0.32)] backdrop-blur-2xl"
+                            whileHover={{ y: -2 }}
+                            transition={{ duration: 0.22 }}
                         >
-                            Already have an account?{' '}
-                            <TextLink href={login()} style={{ color: CIM.accent, fontWeight: 600 }}>
-                                Log in
-                            </TextLink>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                            <div className="border-b border-white/10 px-5 py-4 sm:px-7">
+                                <div className="hidden lg:block">
+                                    <img
+                                        src="/logo_twil.png"
+                                        alt="CIM Bank"
+                                        className="h-10 w-auto max-w-[205px] object-contain"
+                                    />
+                                </div>
 
-            {/* Inline styles for buttons */}
-            <style>{`
-                .cim-btn-primary {
-                    width: 100%;
-                    padding: 14px 24px;
-                    font-size: 0.92rem;
-                    font-weight: 600;
-                    font-family: 'Inter', sans-serif;
-                    letter-spacing: 0.06em;
-                    color: #ffffff;
-                    background: linear-gradient(135deg, ${CIM.primary} 0%, ${CIM.secondary} 60%, #0d7a8c 100%);
-                    border: 1.5px solid rgba(212, 162, 60, 0.25);
-                    border-radius: 12px;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    box-shadow: 0 6px 24px rgba(0,0,0,0.3);
-                }
-                .cim-btn-primary:hover:not(:disabled) {
-                    border-color: rgba(212, 162, 60, 0.6);
-                    box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 30px rgba(212, 162, 60, 0.15);
-                    transform: translateY(-1px);
-                }
-                .cim-btn-primary:disabled {
-                    cursor: not-allowed;
-                }
-                .cim-btn-secondary {
-                    padding: 14px 24px;
-                    font-size: 0.88rem;
-                    font-weight: 500;
-                    font-family: 'Inter', sans-serif;
-                    color: rgba(255,255,255,0.6);
-                    background: rgba(255,255,255,0.06);
-                    border: 1px solid rgba(209,217,218,0.15);
-                    border-radius: 12px;
-                    cursor: pointer;
-                    transition: all 0.25s;
-                }
-                .cim-btn-secondary:hover {
-                    border-color: rgba(10,100,116,0.4);
-                    color: rgba(255,255,255,0.8);
-                    background: rgba(255,255,255,0.1);
-                }
-            `}</style>
+                                <div className="mt-4 flex items-start justify-between gap-4">
+                                    <div>
+                                        <div className="inline-flex items-center gap-2 rounded-full border border-[#D4A23C]/35 bg-[#D4A23C]/12 px-3 py-1 text-xs font-semibold text-[#F6D27B]">
+                                            <currentStep.icon className="h-3.5 w-3.5" />
+                                            Step {step} of 3
+                                        </div>
+
+                                        <h2 className="mt-3 text-2xl font-semibold tracking-tight text-white">
+                                            {currentStep.title}
+                                        </h2>
+
+                                        <p className="mt-1 text-sm leading-6 text-white/62">
+                                            {currentStep.description}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <StepIndicator current={step} />
+                            </div>
+
+                            <form
+                                onSubmit={handleSubmit}
+                                className="px-5 py-4 sm:px-7"
+                            >
+                                {step === 1 && (
+                                    <div className="grid gap-3">
+                                        <CimField
+                                            label="Full name"
+                                            error={errors.name}
+                                            icon={UserRound}
+                                        >
+                                            <CimInput
+                                                type="text"
+                                                value={form.name}
+                                                onChange={(event) =>
+                                                    updateField(
+                                                        'name',
+                                                        event.target.value,
+                                                    )
+                                                }
+                                                placeholder="Mohamed Amine"
+                                                autoFocus
+                                            />
+                                        </CimField>
+
+                                        <CimField
+                                            label="Email address"
+                                            error={errors.email}
+                                            icon={Mail}
+                                        >
+                                            <CimInput
+                                                type="email"
+                                                value={form.email}
+                                                onChange={(event) =>
+                                                    updateField(
+                                                        'email',
+                                                        event.target.value,
+                                                    )
+                                                }
+                                                placeholder="email@example.com"
+                                            />
+                                        </CimField>
+
+                                        <CimField
+                                            label="Phone number"
+                                            error={errors.phone}
+                                            icon={Phone}
+                                        >
+                                            <CimInput
+                                                type="tel"
+                                                value={form.phone}
+                                                onChange={(event) =>
+                                                    updateField(
+                                                        'phone',
+                                                        event.target.value,
+                                                    )
+                                                }
+                                                placeholder="+212 6XX XXX XXX"
+                                            />
+                                        </CimField>
+                                    </div>
+                                )}
+
+                                {step === 2 && (
+                                    <div className="grid gap-3">
+                                        <CimField
+                                            label="Password"
+                                            error={errors.password}
+                                            icon={LockKeyhole}
+                                        >
+                                            <CimInput
+                                                type="password"
+                                                value={form.password}
+                                                onChange={(event) =>
+                                                    updateField(
+                                                        'password',
+                                                        event.target.value,
+                                                    )
+                                                }
+                                                placeholder="Min. 8 characters"
+                                                autoFocus
+                                            />
+                                        </CimField>
+
+                                        <CimField
+                                            label="Confirm password"
+                                            error={
+                                                errors.password_confirmation
+                                            }
+                                            icon={LockKeyhole}
+                                        >
+                                            <CimInput
+                                                type="password"
+                                                value={
+                                                    form.password_confirmation
+                                                }
+                                                onChange={(event) =>
+                                                    updateField(
+                                                        'password_confirmation',
+                                                        event.target.value,
+                                                    )
+                                                }
+                                                placeholder="Re-enter password"
+                                            />
+                                        </CimField>
+
+                                        <div className="grid gap-3 sm:grid-cols-2">
+                                            <CimField
+                                                label="Date of birth"
+                                                error={errors.date_of_birth}
+                                            >
+                                                <CimInput
+                                                    type="date"
+                                                    value={form.date_of_birth}
+                                                    onChange={(event) =>
+                                                        updateField(
+                                                            'date_of_birth',
+                                                            event.target.value,
+                                                        )
+                                                    }
+                                                />
+                                            </CimField>
+
+                                            <CimField
+                                                label="Address"
+                                                error={errors.address}
+                                                icon={MapPin}
+                                            >
+                                                <CimInput
+                                                    type="text"
+                                                    value={form.address}
+                                                    onChange={(event) =>
+                                                        updateField(
+                                                            'address',
+                                                            event.target.value,
+                                                        )
+                                                    }
+                                                    placeholder="Street, city"
+                                                />
+                                            </CimField>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {step === 3 && (
+                                    <div className="grid gap-3">
+                                        <div className="grid gap-3 sm:grid-cols-2">
+                                            <CimField
+                                                label="CIN number"
+                                                error={errors.cin}
+                                                icon={IdCard}
+                                            >
+                                                <CimInput
+                                                    type="text"
+                                                    value={form.cin}
+                                                    onChange={(event) =>
+                                                        updateField(
+                                                            'cin',
+                                                            event.target.value,
+                                                        )
+                                                    }
+                                                    placeholder="AB123456"
+                                                    autoFocus
+                                                />
+                                            </CimField>
+
+                                            <CimField
+                                                label="Profession"
+                                                error={errors.profession}
+                                                icon={BriefcaseBusiness}
+                                            >
+                                                <CimInput
+                                                    type="text"
+                                                    value={form.profession}
+                                                    onChange={(event) =>
+                                                        updateField(
+                                                            'profession',
+                                                            event.target.value,
+                                                        )
+                                                    }
+                                                    placeholder="Software Engineer"
+                                                />
+                                            </CimField>
+                                        </div>
+
+                                        <CimField
+                                            label="Preferred branch"
+                                            error={errors.branch_id}
+                                            icon={Building2}
+                                        >
+                                            <CimSelect
+                                                value={form.branch_id}
+                                                onChange={(event) =>
+                                                    updateField(
+                                                        'branch_id',
+                                                        event.target.value,
+                                                    )
+                                                }
+                                                options={(branches ?? []).map(
+                                                    (branch) => ({
+                                                        value: String(branch.id),
+                                                        label: `${branch.name} — ${branch.city}`,
+                                                    }),
+                                                )}
+                                                placeholder="Select a branch"
+                                            />
+                                        </CimField>
+
+                                        <div className="grid gap-3 sm:grid-cols-2">
+                                            <CimField
+                                                label="CIN front image"
+                                                error={errors.cin_front}
+                                            >
+                                                <CimFileInput
+                                                    file={form.cin_front}
+                                                    onChange={(file) =>
+                                                        updateField(
+                                                            'cin_front',
+                                                            file,
+                                                        )
+                                                    }
+                                                />
+                                            </CimField>
+
+                                            <CimField
+                                                label="CIN back image"
+                                                error={errors.cin_back}
+                                            >
+                                                <CimFileInput
+                                                    file={form.cin_back}
+                                                    onChange={(file) =>
+                                                        updateField(
+                                                            'cin_back',
+                                                            file,
+                                                        )
+                                                    }
+                                                />
+                                            </CimField>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="mt-4 flex gap-3">
+                                    {step > 1 && (
+                                        <button
+                                            type="button"
+                                            onClick={prevStep}
+                                            className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-white/12 bg-white/[0.08] px-5 text-sm font-semibold text-white/78 transition hover:bg-white/[0.12]"
+                                        >
+                                            <ArrowLeft className="h-4 w-4" />
+                                            Back
+                                        </button>
+                                    )}
+
+                                    {step < 3 ? (
+                                        <button
+                                            type="button"
+                                            onClick={nextStep}
+                                            className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-2xl bg-[#D4A23C] px-5 text-sm font-bold text-[#061F39] shadow-lg shadow-[#D4A23C]/20 transition hover:-translate-y-0.5 hover:bg-[#e2b34a]"
+                                        >
+                                            Next
+                                            <ArrowRight className="h-4 w-4" />
+                                        </button>
+                                    ) : (
+                                        <button
+                                            type="submit"
+                                            disabled={processing}
+                                            className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-2xl bg-[#D4A23C] px-5 text-sm font-bold text-[#061F39] shadow-lg shadow-[#D4A23C]/20 transition hover:-translate-y-0.5 hover:bg-[#e2b34a] disabled:cursor-not-allowed disabled:opacity-60"
+                                        >
+                                            {processing
+                                                ? 'Submitting...'
+                                                : 'Submit request'}
+                                            {!processing && (
+                                                <ArrowRight className="h-4 w-4" />
+                                            )}
+                                        </button>
+                                    )}
+                                </div>
+
+                                <div className="mt-4 rounded-2xl border border-white/12 bg-white/[0.08] px-4 py-3 text-center text-sm text-white/65">
+                                    Already have an account?{' '}
+                                    <TextLink
+                                        href={login()}
+                                        className="font-bold text-[#F6D27B] hover:text-white"
+                                    >
+                                        Log in
+                                    </TextLink>
+                                </div>
+                            </form>
+                        </motion.div>
+
+                        <p className="register-reveal mt-3 text-center text-xs leading-6 text-white/58">
+                            Your request is reviewed by CIM staff before account
+                            activation.
+                        </p>
+                    </section>
+                </div>
+            </main>
         </>
     );
 }
 
-/* ── Layout for Fortify ── */
-Register.layout = {
-    title: 'Open an Account',
-    description: 'Complete the onboarding process to open your CIM bank account',
-};
-
-/* ── Step Indicator ── */
 function StepIndicator({ current }: { current: number }) {
     return (
-        <div
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 0,
-                marginBottom: 28,
-                width: '100%',
-                maxWidth: 520,
-            }}
-        >
-            {STEPS.map((s, i) => {
-                const stepNum = i + 1;
-                const isActive = stepNum === current;
-                const isDone = stepNum < current;
-                const isLast = i === STEPS.length - 1;
+        <div className="mt-4 grid grid-cols-3 gap-2">
+            {steps.map(({ number, label }) => {
+                const active = number === current;
+                const done = number < current;
+
                 return (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', flex: isLast ? '0 0 auto' : 1 }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                            <div
-                                style={{
-                                    width: 36,
-                                    height: 36,
-                                    borderRadius: '50%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '0.8rem',
-                                    fontWeight: 700,
-                                    background: isDone
-                                        ? CIM.accent
-                                        : isActive
-                                          ? `linear-gradient(135deg, ${CIM.primary}, ${CIM.secondary})`
-                                          : 'rgba(255,255,255,0.08)',
-                                    color: isDone || isActive ? CIM.white : 'rgba(255,255,255,0.35)',
-                                    border: isActive ? `2px solid ${CIM.accent}` : '2px solid transparent',
-                                    transition: 'all 0.3s',
-                                }}
-                            >
-                                {isDone ? '✓' : stepNum}
-                            </div>
+                    <div
+                        key={label}
+                        className={`rounded-2xl border px-3 py-2 transition ${
+                            active
+                                ? 'border-[#D4A23C]/60 bg-[#D4A23C]/12'
+                                : done
+                                  ? 'border-emerald-300/25 bg-emerald-400/10'
+                                  : 'border-white/12 bg-white/[0.06]'
+                        }`}
+                    >
+                        <div className="flex items-center gap-2">
                             <span
-                                style={{
-                                    fontSize: '0.6rem',
-                                    color: isActive ? CIM.accent : isDone ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.3)',
-                                    fontWeight: isActive ? 600 : 400,
-                                    textAlign: 'center',
-                                    whiteSpace: 'nowrap',
-                                    letterSpacing: '0.02em',
-                                }}
+                                className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+                                    active
+                                        ? 'bg-[#D4A23C] text-[#061F39]'
+                                        : done
+                                          ? 'bg-emerald-400 text-[#061F39]'
+                                          : 'bg-white/10 text-white/50'
+                                }`}
                             >
-                                {s.label}
+                                {done ? '✓' : number}
+                            </span>
+                            <span
+                                className={`text-xs font-semibold ${
+                                    active
+                                        ? 'text-[#F6D27B]'
+                                        : done
+                                          ? 'text-emerald-100'
+                                          : 'text-white/42'
+                                }`}
+                            >
+                                {label}
                             </span>
                         </div>
-                        {!isLast && (
-                            <div
-                                style={{
-                                    flex: 1,
-                                    height: 2,
-                                    margin: '0 8px',
-                                    marginBottom: 20,
-                                    background: isDone ? CIM.accent : 'rgba(255,255,255,0.1)',
-                                    borderRadius: 1,
-                                    transition: 'background 0.3s',
-                                }}
-                            />
-                        )}
                     </div>
                 );
             })}
@@ -535,65 +738,42 @@ function StepIndicator({ current }: { current: number }) {
     );
 }
 
-/* ── Reusable Field ── */
-function CimField({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+function CimField({
+    label,
+    error,
+    icon: Icon,
+    children,
+}: {
+    label: string;
+    error?: string;
+    icon?: ComponentType<{ className?: string }>;
+    children: ReactNode;
+}) {
     return (
-        <div>
-            <label
-                style={{
-                    display: 'block',
-                    fontSize: '0.72rem',
-                    fontWeight: 600,
-                    color: 'rgba(255,255,255,0.65)',
-                    marginBottom: 6,
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase' as const,
-                }}
-            >
+        <label className="block">
+            <span className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold tracking-[0.12em] text-white/64 uppercase">
+                {Icon ? <Icon className="h-3.5 w-3.5 text-[#F6D27B]" /> : null}
                 {label}
-            </label>
+            </span>
             {children}
-            {error && <p style={{ fontSize: '0.78rem', color: '#f0705a', marginTop: 5 }}>{error}</p>}
-        </div>
+            {error && (
+                <span className="mt-1 block text-xs font-medium text-rose-200">
+                    {error}
+                </span>
+            )}
+        </label>
     );
 }
 
-/* ── Reusable Input ── */
 function CimInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
     return (
         <input
             {...props}
-            style={{
-                width: '100%',
-                padding: '13px 14px',
-                fontSize: '0.9rem',
-                fontFamily: "'Inter', sans-serif",
-                color: '#ffffff',
-                background: 'rgba(255,255,255,0.06)',
-                border: '1.5px solid rgba(209,217,218,0.15)',
-                borderRadius: 12,
-                outline: 'none',
-                transition: 'all 0.3s',
-                boxSizing: 'border-box' as const,
-                ...props.style,
-            }}
-            onFocus={(e) => {
-                e.target.style.borderColor = CIM.accent;
-                e.target.style.background = 'rgba(255,255,255,0.1)';
-                e.target.style.boxShadow = `0 0 0 3px rgba(212,162,60,0.12)`;
-                props.onFocus?.(e);
-            }}
-            onBlur={(e) => {
-                e.target.style.borderColor = 'rgba(209,217,218,0.15)';
-                e.target.style.background = 'rgba(255,255,255,0.06)';
-                e.target.style.boxShadow = 'none';
-                props.onBlur?.(e);
-            }}
+            className={`h-10 w-full rounded-2xl border border-white/14 bg-white/12 px-3 text-sm font-semibold text-white outline-none transition placeholder:text-white/36 focus:border-[#D4A23C]/70 focus:bg-white/[0.16] focus:ring-4 focus:ring-[#D4A23C]/15 ${props.className ?? ''}`}
         />
     );
 }
 
-/* ── Select ── */
 function CimSelect({
     value,
     onChange,
@@ -601,7 +781,7 @@ function CimSelect({
     placeholder,
 }: {
     value: string;
-    onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
     options: { value: string; label: string }[];
     placeholder: string;
 }) {
@@ -609,78 +789,73 @@ function CimSelect({
         <select
             value={value}
             onChange={onChange}
-            style={{
-                width: '100%',
-                padding: '13px 14px',
-                fontSize: '0.9rem',
-                fontFamily: "'Inter', sans-serif",
-                color: value ? '#ffffff' : 'rgba(255,255,255,0.3)',
-                background: 'rgba(255,255,255,0.06)',
-                border: '1.5px solid rgba(209,217,218,0.15)',
-                borderRadius: 12,
-                outline: 'none',
-                transition: 'all 0.3s',
-                boxSizing: 'border-box' as const,
-                cursor: 'pointer',
-            }}
+            className="h-10 w-full rounded-2xl border border-white/14 bg-white/12 px-3 text-sm font-semibold text-white outline-none transition focus:border-[#D4A23C]/70 focus:bg-white/[0.16] focus:ring-4 focus:ring-[#D4A23C]/15"
         >
-            <option value="" disabled style={{ background: CIM.dark, color: 'rgba(255,255,255,0.5)' }}>
+            <option value="" disabled className="bg-[#061F39] text-white/60">
                 {placeholder}
             </option>
-            {options.map((o) => (
-                <option key={o.value} value={o.value} style={{ background: CIM.dark, color: '#fff' }}>
-                    {o.label}
+            {options.map((option) => (
+                <option
+                    key={option.value}
+                    value={option.value}
+                    className="bg-[#061F39] text-white"
+                >
+                    {option.label}
                 </option>
             ))}
         </select>
     );
 }
 
-/* ── File Upload ── */
 function CimFileInput({
-    accept,
     file,
     onChange,
 }: {
-    accept: string;
     file: File | null;
-    onChange: (f: File | null) => void;
+    onChange: (file: File | null) => void;
 }) {
     return (
-        <div
-            style={{
-                position: 'relative',
-                border: '1.5px dashed rgba(209,217,218,0.2)',
-                borderRadius: 12,
-                padding: '18px 14px',
-                textAlign: 'center',
-                cursor: 'pointer',
-                background: 'rgba(255,255,255,0.03)',
-                transition: 'all 0.3s',
-            }}
-            onClick={() => {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = accept;
-                input.onchange = (e) => {
-                    const target = e.target as HTMLInputElement;
-                    onChange(target.files?.[0] ?? null);
-                };
-                input.click();
-            }}
-        >
+        <label className="flex h-20 cursor-pointer items-center justify-center rounded-2xl border border-dashed border-white/18 bg-white/[0.08] px-3 text-center transition hover:border-[#D4A23C]/60 hover:bg-white/[0.12]">
+            <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(event) => onChange(event.target.files?.[0] ?? null)}
+            />
+
             {file ? (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                    <span style={{ color: CIM.accent, fontSize: '1.1rem' }}>✓</span>
-                    <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem' }}>{file.name}</span>
+                <div>
+                    <CheckCircle2 className="mx-auto mb-1 h-5 w-5 text-[#F6D27B]" />
+                    <p className="max-w-[170px] truncate text-xs font-semibold text-white/80">
+                        {file.name}
+                    </p>
                 </div>
             ) : (
                 <div>
-                    <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }}>
-                        Click to upload image
-                    </span>
+                    <UploadCloud className="mx-auto mb-1 h-5 w-5 text-[#F6D27B]" />
+                    <p className="text-xs font-semibold text-white/58">
+                        Upload image
+                    </p>
                 </div>
             )}
+        </label>
+    );
+}
+
+function TrustCard({
+    icon: Icon,
+    title,
+    text,
+}: {
+    icon: ComponentType<{ className?: string }>;
+    title: string;
+    text: string;
+}) {
+    return (
+        <div className="rounded-2xl border border-white/12 bg-white/10 p-4 backdrop-blur-xl">
+            <Icon className="mb-3 h-5 w-5 text-[#F6D27B]" />
+            <p className="text-sm font-semibold text-white">{title}</p>
+            <p className="mt-1 text-xs text-white/55">{text}</p>
         </div>
     );
 }

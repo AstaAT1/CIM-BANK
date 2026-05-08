@@ -5,6 +5,7 @@ use App\Http\Controllers\Customer\BeneficiaryController;
 use App\Http\Controllers\Customer\BillController;
 use App\Http\Controllers\Customer\ChatbotController;
 use App\Http\Controllers\Customer\ExchangeRateController;
+use App\Http\Controllers\Customer\Machrou3iController;
 use App\Http\Controllers\Customer\TransferController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,6 +32,9 @@ Route::middleware(['auth', 'verified', 'role.customer', 'verified.customer'])
 
         Route::get('/customer/bills', [BillController::class, 'index'])
             ->name('customer.bills');
+
+        Route::get('/customer/machrou3i', [Machrou3iController::class, 'index'])
+            ->name('customer.machrou3i');
 
         Route::post('/customer/chatbot/message', [ChatbotController::class, 'message'])
             ->name('customer.chatbot.message');

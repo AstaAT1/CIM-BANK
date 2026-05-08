@@ -32,7 +32,10 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     const { isCurrentOrParentUrl } = useCurrentUrl();
 
     return (
-        <div className="px-4 py-6" style={{ backgroundColor: '#F7F8FA', minHeight: '100%' }}>
+        <div
+            className="px-4 py-6"
+            style={{ backgroundColor: '#F7F8FA', minHeight: '100%' }}
+        >
             {/* Settings header with CIM styling */}
             <header className="mb-8 space-y-0.5">
                 <h2
@@ -58,12 +61,19 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                 size="sm"
                                 variant="ghost"
                                 asChild
-                                className={cn('w-full justify-start rounded-lg font-medium transition-colors', {
-                                    'bg-white shadow-sm': isCurrentOrParentUrl(item.href),
-                                })}
+                                className={cn(
+                                    'w-full justify-start rounded-lg font-medium transition-colors',
+                                    {
+                                        'bg-white shadow-sm':
+                                            isCurrentOrParentUrl(item.href),
+                                    },
+                                )}
                                 style={
                                     isCurrentOrParentUrl(item.href)
-                                        ? { color: '#082F54', borderLeft: '3px solid #D4A23C' }
+                                        ? {
+                                              color: '#082F54',
+                                              borderLeft: '3px solid #D4A23C',
+                                          }
                                         : { color: '#0A6474' }
                                 }
                             >
@@ -78,12 +88,13 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                     </nav>
                 </aside>
 
-                <Separator className="my-6 lg:hidden" style={{ backgroundColor: '#D1D9DA' }} />
+                <Separator
+                    className="my-6 lg:hidden"
+                    style={{ backgroundColor: '#D1D9DA' }}
+                />
 
                 <div className="flex-1 md:max-w-2xl">
-                    <section className="max-w-xl space-y-8">
-                        {children}
-                    </section>
+                    <section className="max-w-xl space-y-8">{children}</section>
                 </div>
             </div>
         </div>

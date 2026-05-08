@@ -58,6 +58,11 @@ class BankAccount extends Model
         return $this->hasMany(BankCard::class);
     }
 
+    public function machrou3iApplications(): HasMany
+    {
+        return $this->hasMany(Machrou3iApplication::class);
+    }
+
     public function activeBankCard(): HasOne
     {
         return $this->hasOne(BankCard::class)->where('status', 'active')->latestOfMany();

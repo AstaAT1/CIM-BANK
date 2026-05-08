@@ -9,7 +9,7 @@
 
 @theme {
     --font-sans:
-        'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+        'Inter', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
 
@@ -87,14 +87,15 @@
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
     --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.87 0 0);
+    /* CIM Bank sidebar — always dark navy regardless of light/dark mode */
+    --sidebar: #082f54;
+    --sidebar-foreground: rgba(255, 255, 255, 0.9);
+    --sidebar-primary: #d4a23c;
+    --sidebar-primary-foreground: #082f54;
+    --sidebar-accent: rgba(212, 162, 60, 0.15);
+    --sidebar-accent-foreground: #d4a23c;
+    --sidebar-border: rgba(255, 255, 255, 0.08);
+    --sidebar-ring: #0a6474;
 }
 
 .dark {
@@ -122,14 +123,15 @@
     --chart-3: oklch(0.769 0.188 70.08);
     --chart-4: oklch(0.627 0.265 303.9);
     --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
+    /* CIM Bank sidebar dark mode — same branded navy */
+    --sidebar: #061f39;
+    --sidebar-foreground: rgba(255, 255, 255, 0.9);
+    --sidebar-primary: #d4a23c;
+    --sidebar-primary-foreground: #061f39;
+    --sidebar-accent: rgba(212, 162, 60, 0.18);
+    --sidebar-accent-foreground: #d4a23c;
+    --sidebar-border: rgba(255, 255, 255, 0.07);
+    --sidebar-ring: #0a6474;
 }
 
 @layer base {
@@ -139,5 +141,77 @@
 
     body {
         @apply bg-background text-foreground;
+    }
+
+    select {
+        color-scheme: light;
+    }
+
+    select option {
+        background-color: #ffffff;
+        color: #061f39;
+    }
+
+    select option:disabled {
+        color: rgba(6, 31, 57, 0.58);
+    }
+
+    select option:checked {
+        background-color: #d4a23c;
+        color: #061f39;
+    }
+
+    .dark select,
+    select[class*='text-white'],
+    select[class*='text-[#EAF2F8]'],
+    select[class*='cim-field'],
+    select[class*='atm-readable-field'],
+    select[class*='bg-white/12'],
+    select[class*='bg-white/[0.06]'],
+    select[class*='bg-white/[0.07]'],
+    select[class*='bg-white/[0.08]'],
+    select[class*='bg-white/[0.10]'] {
+        color-scheme: dark;
+    }
+
+    .dark select option,
+    select[class*='text-white'] option,
+    select[class*='text-[#EAF2F8]'] option,
+    select[class*='cim-field'] option,
+    select[class*='atm-readable-field'] option,
+    select[class*='bg-white/12'] option,
+    select[class*='bg-white/[0.06]'] option,
+    select[class*='bg-white/[0.07]'] option,
+    select[class*='bg-white/[0.08]'] option,
+    select[class*='bg-white/[0.10]'] option {
+        background-color: #061f39;
+        color: #ffffff;
+    }
+
+    .dark select option:disabled,
+    select[class*='text-white'] option:disabled,
+    select[class*='text-[#EAF2F8]'] option:disabled,
+    select[class*='cim-field'] option:disabled,
+    select[class*='atm-readable-field'] option:disabled,
+    select[class*='bg-white/12'] option:disabled,
+    select[class*='bg-white/[0.06]'] option:disabled,
+    select[class*='bg-white/[0.07]'] option:disabled,
+    select[class*='bg-white/[0.08]'] option:disabled,
+    select[class*='bg-white/[0.10]'] option:disabled {
+        color: rgba(255, 255, 255, 0.62);
+    }
+
+    .dark select option:checked,
+    select[class*='text-white'] option:checked,
+    select[class*='text-[#EAF2F8]'] option:checked,
+    select[class*='cim-field'] option:checked,
+    select[class*='atm-readable-field'] option:checked,
+    select[class*='bg-white/12'] option:checked,
+    select[class*='bg-white/[0.06]'] option:checked,
+    select[class*='bg-white/[0.07]'] option:checked,
+    select[class*='bg-white/[0.08]'] option:checked,
+    select[class*='bg-white/[0.10]'] option:checked {
+        background-color: #d4a23c;
+        color: #061f39;
     }
 }

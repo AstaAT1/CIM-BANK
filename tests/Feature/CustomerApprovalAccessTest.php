@@ -138,7 +138,8 @@ class CustomerApprovalAccessTest extends TestCase
         foreach ([$admin, $employee] as $staff) {
             $this->assertFalse($staff->hasRole('customer'));
 
-            $this->actingAs($staff)->get(route('admin.dashboard'))->assertOk();
+            $this->actingAs($staff)->get(route('admin.dashboard'))->assertRedirect(route('admin.customers-dashboard.index'));
+            $this->actingAs($staff)->get('/admin/beneficiaries')->assertRedirect(route('admin.customers-dashboard.index'));
             $this->actingAs($staff)->get(route('backend.admin.dashboard'))->assertOk();
             $this->actingAs($staff)->get('/dashboard')->assertForbidden();
             $this->actingAs($staff)->get('/customer/atm-map')->assertForbidden();

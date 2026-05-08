@@ -1,20 +1,17 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
-    BookOpen,
-    FolderGit2,
+    BriefcaseBusiness,
     Coins,
     LayoutDashboard,
     MapPin,
     MapPinned,
     ReceiptText,
     Send,
-    User,
     UserCheck,
     Users,
     UsersRound,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -25,23 +22,17 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarRail,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { pending } from '@/routes/account';
-import { dashboard as adminDashboard } from '@/routes/admin';
 import { index as accountOpeningRequestsIndex } from '@/routes/admin/account-opening-requests';
-import { index as appointmentAttendeesIndex } from '@/routes/admin/appointment-attendees';
 import { index as adminAtmsIndex } from '@/routes/admin/atms';
+import { index as customersDashboardIndex } from '@/routes/admin/customers-dashboard';
 import { atmMap, exchangeRates } from '@/routes/customer';
-import { edit as editProfile } from '@/routes/profile';
 import type { NavItem } from '@/types';
 
 const bankOperationsNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: adminDashboard(),
-        icon: LayoutDashboard,
-    },
     {
         title: 'Verification Users',
         href: accountOpeningRequestsIndex(),
@@ -50,7 +41,7 @@ const bankOperationsNavItems: NavItem[] = [
     },
     {
         title: 'Customers Dashboard',
-        href: appointmentAttendeesIndex(),
+        href: customersDashboardIndex(),
         icon: Users,
         activeMatch: 'prefix',
     },
@@ -61,24 +52,18 @@ const bankOperationsNavItems: NavItem[] = [
         activeMatch: 'prefix',
     },
     {
-        title: 'Beneficiary Approvals',
-        href: '/admin/beneficiaries',
-        icon: UsersRound,
+        title: 'Machrou3i Review',
+        href: '/admin/machrou3i',
+        icon: BriefcaseBusiness,
         activeMatch: 'prefix',
     },
 ];
 
 const verifiedCustomerNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
+        title: 'Home',
         href: dashboard(),
         icon: LayoutDashboard,
-    },
-    {
-        title: 'Profile',
-        href: editProfile(),
-        icon: User,
-        activeMatch: 'prefix',
     },
     {
         title: 'ATM Locator',
@@ -110,32 +95,19 @@ const verifiedCustomerNavItems: NavItem[] = [
         icon: ReceiptText,
         activeMatch: 'prefix',
     },
-];
-
-const limitedCustomerNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
-        href: pending(),
-        icon: LayoutDashboard,
-    },
-    {
-        title: 'Profile',
-        href: editProfile(),
-        icon: User,
+        title: 'Machrou3i',
+        href: '/customer/machrou3i',
+        icon: BriefcaseBusiness,
         activeMatch: 'prefix',
     },
 ];
 
-const footerNavItems: NavItem[] = [
+const limitedCustomerNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
+        title: 'Home',
+        href: pending(),
+        icon: LayoutDashboard,
     },
 ];
 
@@ -144,12 +116,14 @@ export function AppSidebar() {
     const roles = auth.user?.roles ?? [];
     const isBankStaff = roles.includes('admin') || roles.includes('employee');
     const isVerifiedCustomer = auth.user?.profile?.status === 'verified';
+
     const homeHref = isBankStaff
-        ? adminDashboard()
+        ? customersDashboardIndex()
         : isVerifiedCustomer
           ? dashboard()
           : pending();
-    const navLabel = isBankStaff ? 'Bank Operations' : 'My Banking';
+
+    const navLabel = isBankStaff ? 'Bank Operations' : 'Home';
     const navItems = isBankStaff
         ? bankOperationsNavItems
         : isVerifiedCustomer
@@ -157,27 +131,54 @@ export function AppSidebar() {
           : limitedCustomerNavItems;
 
     return (
-        <Sidebar collapsible="icon" variant="inset">
-            <SidebarHeader>
+        <Sidebar
+            collapsible="icon"
+            variant="sidebar"
+            className="border-r border-[#0A6474]/15 bg-[#061F39]"
+        >
+            <SidebarHeader className="px-4 pt-5 pb-4 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:pt-4 group-data-[collapsible=icon]:pb-3">
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <Link href={homeHref} prefetch>
-                                <AppLogo />
+                        <SidebarMenuButton
+                            size="lg"
+                            asChild
+                            tooltip="CIM Bank"
+                            className="h-14 rounded-2xl border-0 bg-transparent px-0 text-white shadow-none hover:bg-white/[0.06] data-[active=true]:bg-transparent group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:h-11! group-data-[collapsible=icon]:w-11! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:rounded-2xl group-data-[collapsible=icon]:p-0!"
+                        >
+                            <Link
+                                href={homeHref}
+                                prefetch
+                                className="flex min-w-0 items-center group-data-[collapsible=icon]:justify-center"
+                            >
+                                <AppLogo
+                                    variant="wide"
+                                    className="h-12 w-auto max-w-[180px] group-data-[collapsible=icon]:hidden"
+                                />
+                                <AppLogo
+                                    variant="mark"
+                                    className="hidden h-9 w-9 group-data-[collapsible=icon]:block"
+                                />
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent>
+            <SidebarContent className="px-3 pt-1 pb-3 !overflow-visible group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:gap-2 group-data-[collapsible=icon]:overflow-hidden! group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:pt-1">
+                <div className="mb-3 px-2 group-data-[collapsible=icon]:hidden">
+                    <p className="text-[11px] font-bold tracking-[0.18em] text-white/35 uppercase">
+                        {navLabel}
+                    </p>
+                </div>
+
                 <NavMain items={navItems} label={navLabel} />
             </SidebarContent>
 
-            <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+            <SidebarFooter className="mt-auto border-t border-white/10 px-4 pt-3 pb-4 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:pt-3 group-data-[collapsible=icon]:pb-4">
                 <NavUser />
             </SidebarFooter>
+
+            <SidebarRail />
         </Sidebar>
     );
 }

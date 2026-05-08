@@ -85,6 +85,11 @@ class User extends Authenticatable
         return $this->hasMany(SupportTicket::class);
     }
 
+    public function machrou3iApplications(): HasMany
+    {
+        return $this->hasMany(Machrou3iApplication::class);
+    }
+
     /**
      * ATM withdrawals made by this user.
      */

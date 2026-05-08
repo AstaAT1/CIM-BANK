@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AtmController;
-use App\Http\Controllers\Admin\BeneficiaryController;
+use App\Http\Controllers\Admin\Machrou3iController;
 use App\Models\AccountOpeningRequest;
 use App\Models\AccountTransaction;
 use App\Models\TransferRequest;
@@ -131,16 +131,16 @@ Route::middleware(['auth', 'role.admin'])
             }
         )->name('transfers.complete');
 
-        Route::patch('/beneficiaries/{beneficiary}/activate', [BeneficiaryController::class, 'activate'])
-            ->name('beneficiaries.activate');
-        Route::patch('/beneficiaries/{beneficiary}/reject', [BeneficiaryController::class, 'reject'])
-            ->name('beneficiaries.reject');
-
         // ── ATM view routes (admin + employee) ───────────────────────────
         Route::get('/atms', [AtmController::class, 'index'])->name('atms.index');
         Route::get('/atms/{atm}', [AtmController::class, 'show'])->name('atms.show');
         Route::get('/atms/{atm}/cash-movements', [AtmController::class, 'cashMovements'])->name('atms.cash-movements');
         Route::get('/atms/{atm}/withdrawals', [AtmController::class, 'withdrawals'])->name('atms.withdrawals');
+
+        Route::patch('/machrou3i/{application}/pre-approve', [Machrou3iController::class, 'preApprove'])->name('machrou3i.pre-approve');
+        Route::patch('/machrou3i/{application}/pre-approve-lower', [Machrou3iController::class, 'preApproveLower'])->name('machrou3i.pre-approve-lower');
+        Route::patch('/machrou3i/{application}/reject', [Machrou3iController::class, 'reject'])->name('machrou3i.reject');
+        Route::patch('/machrou3i/{application}/request-documents', [Machrou3iController::class, 'requestDocuments'])->name('machrou3i.request-documents');
     });
 
 // ── Admin-only ATM management routes ──────────────────────────────────────

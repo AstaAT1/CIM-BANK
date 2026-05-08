@@ -8,14 +8,33 @@ import SettingsLayout from '@/layouts/settings/layout';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
+const standalonePageNames = [
+    'welcome',
+    'auth/login',
+    'auth/register',
+    'account-pending',
+    'account/pending',
+];
+
+const standalonePagePrefixes = ['onboarding/'];
+
+function isStandalonePage(name: string) {
+    return (
+        standalonePageNames.includes(name) ||
+        standalonePagePrefixes.some((prefix) => name.startsWith(prefix))
+    );
+}
+
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {
-            case name === 'welcome':
+            case isStandalonePage(name):
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
+            case name === 'settings/profile':
+                return AppLayout;
             case name.startsWith('settings/'):
                 return [AppLayout, SettingsLayout];
             default:

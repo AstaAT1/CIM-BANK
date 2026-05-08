@@ -67,6 +67,7 @@ class DashboardController extends Controller
                 'active_cards' => $user->bankCards()->where('status', 'active')->count(),
                 'last_activity_at' => $this->lastActivityAt($accountIds)?->toIso8601String(),
                 'upcoming_bill' => $this->upcomingBill($user->id),
+                'machrou3i' => $this->latestMachrou3iApplication($user->id),
             ],
         ]);
     }
@@ -192,6 +193,25 @@ class DashboardController extends Controller
             'amount' => (float) $bill->amount,
             'next_due_at' => $bill->next_due_at?->toIso8601String(),
             'autopay_enabled' => (bool) $bill->autopay_enabled,
+        ];
+    }
+
+    private function latestMachrou3iApplication(int $userId): ?array
+    {
+        $application = \App\Models\Machrou3iApplication::query()
+            ->where('user_id', $userId)
+            ->latest()
+            ->first();
+
+        if (! $application) {
+            return null;
+        }
+
+        return [
+            'project_name' => $application->project_name,
+            'status' => $application->status,
+            'requested_amount' => (float) $application->requested_amount,
+            'risk_level' => $application->risk_level,
         ];
     }
 }

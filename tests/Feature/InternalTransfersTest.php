@@ -226,7 +226,7 @@ class InternalTransfersTest extends TestCase
         $this->assertSame(0, TransferRequest::count());
     }
 
-    public function test_admin_or_employee_can_activate_pending_beneficiary(): void
+    public function test_admin_beneficiary_activation_endpoint_is_retired(): void
     {
         $employee = User::factory()->create();
         $employee->assignRole('employee');
@@ -234,14 +234,13 @@ class InternalTransfersTest extends TestCase
         [$sender, , , $beneficiary] = $this->transferFixture('pending');
 
         $this->actingAs($employee)
-            ->patch(route('backend.admin.beneficiaries.activate', $beneficiary))
-            ->assertRedirect()
-            ->assertSessionHas('success');
+            ->patch("/backend/admin/beneficiaries/{$beneficiary->id}/activate")
+            ->assertNotFound();
 
         $beneficiary->refresh();
 
-        $this->assertSame('active', $beneficiary->status);
-        $this->assertNotNull($beneficiary->verified_at);
+        $this->assertSame('pending', $beneficiary->status);
+        $this->assertNull($beneficiary->verified_at);
         $this->assertSame($sender->id, $beneficiary->user_id);
     }
 

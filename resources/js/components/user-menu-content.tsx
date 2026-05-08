@@ -1,5 +1,5 @@
 import { Link, router } from '@inertiajs/react';
-import { LogOut, Settings } from 'lucide-react';
+import { LogOut, User as UserIcon } from 'lucide-react';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
@@ -26,38 +26,53 @@ export function UserMenuContent({ user }: Props) {
 
     return (
         <>
+            {/* User identity header */}
             <DropdownMenuLabel className="p-0 font-normal">
-                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                <div className="flex items-center gap-2.5 px-3 py-2.5">
                     <UserInfo user={user} showEmail={true} />
                 </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-                <DropdownMenuItem asChild>
+
+            <DropdownMenuSeparator className="bg-white/10" />
+
+            {/* Profile link */}
+            <DropdownMenuGroup className="p-1">
+                <DropdownMenuItem
+                    asChild
+                    className="cursor-pointer rounded-lg px-3 py-2 text-sm text-white/80 transition-colors duration-100 hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white"
+                >
                     <Link
-                        className="block w-full cursor-pointer"
+                        className="flex w-full items-center gap-2.5"
                         href={edit()}
                         prefetch
                         onClick={cleanup}
                     >
-                        <Settings className="mr-2" />
-                        Settings
+                        <UserIcon className="size-4 text-[#0A6474]" />
+                        <span>Profile</span>
                     </Link>
                 </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-                <Link
-                    className="block w-full cursor-pointer"
-                    href={logout()}
-                    as="button"
-                    onClick={handleLogout}
-                    data-test="logout-button"
+
+            <DropdownMenuSeparator className="bg-white/10" />
+
+            {/* Logout */}
+            <div className="p-1">
+                <DropdownMenuItem
+                    asChild
+                    className="cursor-pointer rounded-lg px-3 py-2 text-sm text-white/70 transition-colors duration-100 hover:bg-red-500/15 hover:text-red-400 focus:bg-red-500/15 focus:text-red-400"
                 >
-                    <LogOut className="mr-2" />
-                    Log out
-                </Link>
-            </DropdownMenuItem>
+                    <Link
+                        className="flex w-full items-center gap-2.5"
+                        href={logout()}
+                        as="button"
+                        onClick={handleLogout}
+                        data-test="logout-button"
+                    >
+                        <LogOut className="size-4" />
+                        <span>Log out</span>
+                    </Link>
+                </DropdownMenuItem>
+            </div>
         </>
     );
 }

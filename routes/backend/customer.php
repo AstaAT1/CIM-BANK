@@ -4,6 +4,7 @@ use App\Http\Controllers\Customer\AtmMapController;
 use App\Http\Controllers\Customer\AtmWithdrawalController;
 use App\Http\Controllers\Customer\BeneficiaryController;
 use App\Http\Controllers\Customer\BillController;
+use App\Http\Controllers\Customer\Machrou3iController;
 use App\Http\Controllers\Customer\TransferController;
 use App\Models\AccountOpeningRequest;
 use App\Models\Appointment;
@@ -131,6 +132,13 @@ Route::middleware(['auth', 'verified', 'role.customer', 'verified.customer'])
         Route::delete('/bills/{bill}', [BillController::class, 'destroy'])->name('bills.destroy');
         Route::post('/bills/{bill}/pay-now', [BillController::class, 'payNow'])->name('bills.pay-now');
         Route::patch('/bills/{bill}/toggle-autopay', [BillController::class, 'toggleAutopay'])->name('bills.toggle-autopay');
+
+        Route::post('/machrou3i', [Machrou3iController::class, 'store'])->name('machrou3i.store');
+        Route::patch('/machrou3i/{application}', [Machrou3iController::class, 'update'])->name('machrou3i.update');
+        Route::post('/machrou3i/{application}/documents', [Machrou3iController::class, 'storeDocument'])->name('machrou3i.documents.store');
+        Route::patch('/machrou3i/{application}/accept-offer', [Machrou3iController::class, 'acceptOffer'])->name('machrou3i.accept-offer');
+        Route::patch('/machrou3i/{application}/decline-offer', [Machrou3iController::class, 'declineOffer'])->name('machrou3i.decline-offer');
+        Route::delete('/machrou3i/{application}', [Machrou3iController::class, 'destroy'])->name('machrou3i.destroy');
 
         // ATM map — list all Casablanca ATMs
         Route::get('/atm-map', [AtmMapController::class, 'index'])

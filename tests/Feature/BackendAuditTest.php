@@ -192,11 +192,8 @@ class BackendAuditTest extends TestCase
             ->assertSessionHas('success');
 
         $beneficiary = Beneficiary::where('user_id', $customer->id)->firstOrFail();
-
-        $this->actingAs($employee)
-            ->patch(route('backend.admin.beneficiaries.activate', $beneficiary))
-            ->assertRedirect()
-            ->assertSessionHas('success');
+        $this->assertSame('active', $beneficiary->status);
+        $this->assertNotNull($beneficiary->verified_at);
 
         $this->actingAs($customer)
             ->post(route('backend.customer.transfers.store'), [

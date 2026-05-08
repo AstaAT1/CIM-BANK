@@ -1,10 +1,32 @@
-import { Head, router, usePage } from '@inertiajs/react';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import { useCallback, useMemo, useState } from 'react';
 import type { DateSelectArg, EventInput } from '@fullcalendar/core';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import FullCalendar from '@fullcalendar/react';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import { Head, router } from '@inertiajs/react';
+import {
+    ArrowLeft,
+    BadgeCheck,
+    Building2,
+    CalendarCheck,
+    CheckCircle2,
+    Clock3,
+    Eraser,
+    Landmark,
+    Mail,
+    MapPin,
+    MousePointerClick,
+    Phone,
+    RefreshCw,
+    ShieldCheck,
+    Sparkles,
+    UserRound,
+} from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { ComponentType, ReactNode } from 'react';
+import { motion } from 'motion/react';
+import gsap from 'gsap';
+import background from '../customer/images/CIM.png';
 
 const CIM = {
     primary: '#082F54',
@@ -23,90 +45,146 @@ type Props = {
         status: string;
         branch: { id: number; name: string; city: string } | null;
         user: { name: string; email: string; phone: string };
-        customer_profile: { cin: string; employment_status: string; phone: string } | null;
+        customer_profile: {
+            cin: string;
+            employment_status: string;
+            phone: string;
+        } | null;
     };
     bookedSlots: string[];
     branches: { id: number; name: string; city: string }[];
 };
 
-export default function AppointmentBooking({ request: req, bookedSlots }: Props) {
-    const [selectedSlot, setSelectedSlot] = useState<{ start: string; end: string } | null>(null);
+const journeySteps = [
+    { label: 'Contact', done: true },
+    { label: 'Personal', done: true },
+    { label: 'Identity', done: true },
+    { label: 'Appointment', done: false },
+];
+
+export default function AppointmentBooking({
+    request: req,
+    bookedSlots,
+}: Props) {
+    const pageRef = useRef<HTMLDivElement | null>(null);
+    const [selectedSlot, setSelectedSlot] = useState<{
+        start: string;
+        end: string;
+    } | null>(null);
     const [processing, setProcessing] = useState(false);
     const [error, setError] = useState('');
-    const [hovering, setHovering] = useState(false);
 
-    // Format the booked slots from the server as "unavailable" background events
     const bookedEvents = useMemo((): EventInput[] => {
-        return (bookedSlots ?? []).map((iso, i) => {
-            const d = new Date(iso);
-            const end = new Date(d.getTime() + 30 * 60 * 1000);
+        return (bookedSlots ?? []).map((iso, index) => {
+            const start = new Date(iso);
+            const end = new Date(start.getTime() + 30 * 60 * 1000);
+
             return {
-                id: `booked-${i}`,
+                id: `booked-${index}`,
                 title: 'Booked',
-                start: d.toISOString(),
+                start: start.toISOString(),
                 end: end.toISOString(),
                 display: 'background',
-                backgroundColor: '#fee2e2',
+                backgroundColor: 'rgba(248, 113, 113, 0.25)',
                 classNames: ['cim-booked-slot'],
             };
         });
     }, [bookedSlots]);
 
-    // The selected slot rendered as a calendar event
     const selectedEvent = useMemo((): EventInput[] => {
-        if (!selectedSlot) return [];
-        return [{
-            id: 'user-selected',
-            title: '✓ Your Appointment',
-            start: selectedSlot.start,
-            end: selectedSlot.end,
-            backgroundColor: CIM.accent,
-            borderColor: CIM.accent,
-            textColor: CIM.dark,
-            classNames: ['cim-selected-event'],
-        }];
+        if (!selectedSlot) {
+            return [];
+        }
+
+        return [
+            {
+                id: 'user-selected',
+                title: '✓ Your appointment',
+                start: selectedSlot.start,
+                end: selectedSlot.end,
+                backgroundColor: CIM.accent,
+                borderColor: CIM.accent,
+                textColor: CIM.dark,
+                classNames: ['cim-selected-event'],
+            },
+        ];
     }, [selectedSlot]);
 
-    const allEvents = useMemo(() => [...bookedEvents, ...selectedEvent], [bookedEvents, selectedEvent]);
+    const allEvents = useMemo(
+        () => [...bookedEvents, ...selectedEvent],
+        [bookedEvents, selectedEvent],
+    );
 
     const selectedDisplay = useMemo(() => {
-        if (!selectedSlot) return '';
+        if (!selectedSlot) {
+            return '';
+        }
+
         return new Date(selectedSlot.start).toLocaleString('en-US', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-            hour: '2-digit', minute: '2-digit',
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
         });
     }, [selectedSlot]);
 
-    // Check if a slot overlaps with any booked slot
-    const isSlotBooked = useCallback((startStr: string) => {
-        const startMs = new Date(startStr).getTime();
-        return (bookedSlots ?? []).some((iso) => {
-            const bookedMs = new Date(iso).getTime();
-            return Math.abs(startMs - bookedMs) < 30 * 60 * 1000;
-        });
-    }, [bookedSlots]);
-
-    // FullCalendar `select` callback — fires when user clicks/drags a time range
-    const handleSelect = useCallback((info: DateSelectArg) => {
-        const start = new Date(info.startStr);
-        const now = new Date();
-
-        if (start < now) {
-            setError('Cannot select a past time slot.');
-            return;
+    const selectedShort = useMemo(() => {
+        if (!selectedSlot) {
+            return null;
         }
 
-        if (isSlotBooked(info.startStr)) {
-            setError('This slot is already booked. Please choose another.');
-            return;
-        }
+        const date = new Date(selectedSlot.start);
 
-        // Snap to 30-minute slot
-        const end = new Date(start.getTime() + 30 * 60 * 1000);
+        return {
+            day: date.toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+            }),
+            time: date.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+            }),
+        };
+    }, [selectedSlot]);
 
-        setSelectedSlot({ start: info.startStr, end: end.toISOString() });
-        setError('');
-    }, [isSlotBooked]);
+    const isSlotBooked = useCallback(
+        (startStr: string) => {
+            const startMs = new Date(startStr).getTime();
+
+            return (bookedSlots ?? []).some((iso) => {
+                const bookedMs = new Date(iso).getTime();
+
+                return Math.abs(startMs - bookedMs) < 30 * 60 * 1000;
+            });
+        },
+        [bookedSlots],
+    );
+
+    const handleSelect = useCallback(
+        (info: DateSelectArg) => {
+            const start = new Date(info.startStr);
+            const now = new Date();
+
+            if (start < now) {
+                setError('Cannot select a past time slot.');
+                return;
+            }
+
+            if (isSlotBooked(info.startStr)) {
+                setError('This slot is already booked. Please choose another.');
+                return;
+            }
+
+            const end = new Date(start.getTime() + 30 * 60 * 1000);
+
+            setSelectedSlot({ start: info.startStr, end: end.toISOString() });
+            setError('');
+        },
+        [isSlotBooked],
+    );
 
     const clearSelection = useCallback(() => {
         setSelectedSlot(null);
@@ -118,7 +196,9 @@ export default function AppointmentBooking({ request: req, bookedSlots }: Props)
             setError('Please select an appointment time from the calendar.');
             return;
         }
+
         setProcessing(true);
+
         router.post(
             `/onboarding/appointment/${req.id}`,
             { scheduled_at: selectedSlot.start },
@@ -129,318 +209,495 @@ export default function AppointmentBooking({ request: req, bookedSlots }: Props)
         );
     }, [selectedSlot, req.id]);
 
+    useEffect(() => {
+        if (!pageRef.current) {
+            return undefined;
+        }
+
+        const ctx = gsap.context(() => {
+            gsap.fromTo(
+                '.appointment-reveal',
+                { autoAlpha: 0, y: 24 },
+                {
+                    autoAlpha: 1,
+                    y: 0,
+                    duration: 0.72,
+                    stagger: 0.06,
+                    ease: 'power3.out',
+                },
+            );
+
+            gsap.to('.appointment-orb', {
+                x: 18,
+                y: -14,
+                scale: 1.06,
+                duration: 5.2,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut',
+            });
+        }, pageRef);
+
+        return () => ctx.revert();
+    }, []);
+
     return (
         <>
             <Head title="Book an Appointment — CIM" />
-            <div style={{ minHeight: '100vh', background: CIM.bg, fontFamily: "'Inter', sans-serif" }}>
-                {/* Header */}
-                <header style={{
-                    background: `linear-gradient(135deg, ${CIM.dark} 0%, ${CIM.primary} 100%)`,
-                    padding: '32px 24px 28px', textAlign: 'center',
-                }}>
-                    <div style={{ fontSize: '0.65rem', color: CIM.accent, letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 500 }}>
-                        Credit Intelligence Mizan
-                    </div>
-                    <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.4rem', color: CIM.white, margin: '8px 0 4px', fontWeight: 600 }}>
-                        Book Your Appointment
-                    </h1>
-                    <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.5)' }}>
-                        Click or drag on a future time slot to select your appointment
-                    </p>
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginTop: 20 }}>
-                        {['Contact', 'Personal', 'Identity', 'Appointment'].map((label, i) => (
-                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                <div style={{
-                                    width: 28, height: 28, borderRadius: '50%',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: '0.7rem', fontWeight: 700,
-                                    background: i < 3 ? CIM.accent : `linear-gradient(135deg, ${CIM.primary}, ${CIM.secondary})`,
-                                    color: CIM.white,
-                                    border: i === 3 ? `2px solid ${CIM.accent}` : '2px solid transparent',
-                                }}>
-                                    {i < 3 ? '✓' : '4'}
-                                </div>
-                                <span style={{ fontSize: '0.65rem', color: i === 3 ? CIM.accent : 'rgba(255,255,255,0.5)', fontWeight: i === 3 ? 600 : 400 }}>
-                                    {label}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                </header>
 
-                <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 20px 48px' }}>
-                    <div className="cim-appt-layout">
-                        {/* Calendar Card */}
-                        <div style={{
-                            background: CIM.white, borderRadius: 16,
-                            border: `1px solid ${CIM.border}`, padding: 24,
-                            boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-                        }}>
-                            <h2 style={{ color: CIM.primary, fontSize: '1.05rem', fontWeight: 600, marginBottom: 4 }}>
-                                Select Your Appointment
-                            </h2>
-                            <p style={{ fontSize: '0.78rem', color: CIM.secondary, marginBottom: 16 }}>
-                                Click on any future weekday time slot to select it. Red shaded areas are already booked.
-                            </p>
-                            <div className="cim-calendar">
-                                <FullCalendar
-                                    plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                                    initialView="timeGridWeek"
-                                    headerToolbar={{
-                                        left: 'prev,next today',
-                                        center: 'title',
-                                        right: 'timeGridWeek,timeGridDay',
-                                    }}
-                                    /* --- Selection config --- */
-                                    selectable={true}
-                                    selectMirror={true}
-                                    select={handleSelect}
-                                    unselectAuto={false}
-                                    /* --- Events --- */
-                                    events={allEvents}
-                                    /* --- Time constraints --- */
-                                    slotMinTime="08:30:00"
-                                    slotMaxTime="16:30:00"
-                                    slotDuration="00:30:00"
-                                    weekends={false}
-                                    allDaySlot={false}
-                                    /* --- Display --- */
-                                    height="auto"
-                                    nowIndicator={true}
-                                    validRange={{ start: new Date().toISOString().split('T')[0] }}
-                                    eventDisplay="auto"
-                                    longPressDelay={0}
-                                    selectLongPressDelay={0}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Right Sidebar */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                            {/* Summary */}
-                            <div style={{
-                                background: CIM.white, borderRadius: 16,
-                                border: `1px solid ${CIM.border}`, padding: 24,
-                                boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-                            }}>
-                                <h3 style={{ color: CIM.primary, fontSize: '0.95rem', fontWeight: 600, marginBottom: 16 }}>
-                                    Request Summary
-                                </h3>
-                                <SummaryRow label="Full Name" value={req.user.name} />
-                                <SummaryRow label="Email" value={req.user.email} />
-                                <SummaryRow label="Phone" value={req.user.phone} />
-                                <SummaryRow label="CIN" value={req.customer_profile?.cin || '—'} />
-                                <SummaryRow label="Profession" value={req.customer_profile?.employment_status || '—'} />
-                                <SummaryRow label="Branch" value={req.branch?.name || '—'} />
-                                <SummaryRow label="Request #" value={req.request_number} />
-                                <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <span style={{ fontSize: '0.78rem', color: CIM.secondary, fontWeight: 500 }}>Status</span>
-                                    <span style={{
-                                        fontSize: '0.72rem', fontWeight: 600, color: CIM.accent,
-                                        background: `${CIM.accent}15`, padding: '4px 12px',
-                                        borderRadius: 20, border: `1px solid ${CIM.accent}30`,
-                                    }}>Pending Verification</span>
-                                </div>
-                            </div>
-
-                            {/* Booking Card */}
-                            <div style={{
-                                background: CIM.white, borderRadius: 16,
-                                border: `1px solid ${CIM.border}`, padding: 24,
-                                boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-                            }}>
-                                <h3 style={{ color: CIM.primary, fontSize: '0.95rem', fontWeight: 600, marginBottom: 12 }}>
-                                    Confirm Booking
-                                </h3>
-
-                                {selectedSlot ? (
-                                    <div
-                                        onMouseEnter={() => setHovering(true)}
-                                        onMouseLeave={() => setHovering(false)}
-                                        style={{
-                                            position: 'relative', marginBottom: 16,
-                                            padding: '14px 16px', borderRadius: 12,
-                                            border: `2px solid ${CIM.accent}`,
-                                            background: `${CIM.accent}0D`,
-                                        }}
-                                    >
-                                        {/* Hover action icons */}
-                                        <div style={{
-                                            position: 'absolute', top: 8, right: 8,
-                                            display: 'flex', gap: 6,
-                                            opacity: hovering ? 1 : 0,
-                                            transition: 'opacity 0.2s',
-                                        }}>
-                                            <ActionIcon
-                                                title="Change slot"
-                                                onClick={clearSelection}
-                                                hoverBg={`${CIM.secondary}18`}
-                                                hoverBorder={CIM.secondary}
-                                                icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={CIM.secondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>}
-                                            />
-                                            <ActionIcon
-                                                title="Remove"
-                                                onClick={clearSelection}
-                                                hoverBg="#fee2e2"
-                                                hoverBorder="#fca5a5"
-                                                icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>}
-                                            />
-                                        </div>
-
-                                        <p style={{ fontSize: '0.72rem', color: CIM.secondary, marginBottom: 4, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                                            Selected Appointment
-                                        </p>
-                                        <p style={{ fontSize: '0.95rem', color: CIM.dark, fontWeight: 700, margin: 0, lineHeight: 1.4 }}>
-                                            {selectedDisplay}
-                                        </p>
-                                        <p style={{ fontSize: '0.68rem', color: CIM.secondary, marginTop: 6 }}>
-                                            Hover for edit / remove
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <div style={{
-                                        marginBottom: 16, padding: '20px 16px', borderRadius: 12,
-                                        border: `2px dashed ${CIM.border}`, background: CIM.bg,
-                                        textAlign: 'center',
-                                    }}>
-                                        <p style={{ fontSize: '0.82rem', color: 'rgba(0,0,0,0.4)', margin: 0 }}>
-                                            Click on any future time slot on the calendar to select your appointment.
-                                        </p>
-                                    </div>
-                                )}
-
-                                {error && (
-                                    <p style={{
-                                        fontSize: '0.8rem', color: '#e53e3e', marginBottom: 12,
-                                        padding: '8px 12px', background: '#fff5f5', borderRadius: 8,
-                                        border: '1px solid #fecaca',
-                                    }}>
-                                        {error}
-                                    </p>
-                                )}
-
-                                <button
-                                    onClick={handleBook}
-                                    disabled={!selectedSlot || processing}
-                                    style={{
-                                        width: '100%', padding: '13px 20px',
-                                        fontSize: '0.9rem', fontWeight: 600,
-                                        color: CIM.white,
-                                        background: selectedSlot
-                                            ? `linear-gradient(135deg, ${CIM.primary}, ${CIM.secondary})`
-                                            : CIM.border,
-                                        border: selectedSlot
-                                            ? `1.5px solid ${CIM.accent}40`
-                                            : `1.5px solid ${CIM.border}`,
-                                        borderRadius: 12,
-                                        cursor: selectedSlot && !processing ? 'pointer' : 'not-allowed',
-                                        transition: 'all 0.3s',
-                                        opacity: processing ? 0.6 : 1,
-                                    }}
-                                >
-                                    {processing ? 'Booking...' : selectedSlot ? 'Confirm Appointment' : 'Select a Slot First'}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+            <main
+                ref={pageRef}
+                className="relative min-h-svh overflow-x-hidden bg-[#061F39] text-white"
+            >
+                <div className="fixed inset-0">
+                    <img
+                        src={background}
+                        alt="CIM Bank"
+                        className="h-full w-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-[#061F39]/60" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#061F39]/94 via-[#061F39]/68 to-[#061F39]/34" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#061F39]/82 via-transparent to-[#061F39]/20" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(212,162,60,0.25),transparent_28%),radial-gradient(circle_at_88%_18%,rgba(10,100,116,0.22),transparent_34%)]" />
                 </div>
-            </div>
+
+                <div className="appointment-orb pointer-events-none fixed -top-24 right-10 h-80 w-80 rounded-full bg-[#D4A23C]/18 blur-3xl" />
+                <div className="appointment-orb pointer-events-none fixed bottom-10 -left-28 h-96 w-96 rounded-full bg-[#0A6474]/24 blur-3xl" />
+
+                <div className="relative z-10 mx-auto flex min-h-svh max-w-7xl flex-col px-4 py-5 sm:px-6 lg:px-8">
+                    <header className="appointment-reveal mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                        <div>
+                            <img
+                                src="/logo_twil.png"
+                                alt="CIM Bank"
+                                className="h-12 w-auto max-w-[230px] object-contain drop-shadow-2xl"
+                            />
+
+                            <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#D4A23C]/35 bg-[#D4A23C]/12 px-4 py-2 text-xs font-bold tracking-[0.18em] text-[#F6D27B] uppercase backdrop-blur-xl">
+                                <Sparkles className="h-4 w-4" />
+                                Final onboarding step
+                            </div>
+
+                            <h1 className="mt-4 max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
+                                Choose your branch appointment.
+                            </h1>
+
+                            <p className="mt-3 max-w-2xl text-sm leading-7 text-white/68">
+                                Select a future weekday slot for your in-branch
+                                verification. Booked slots are blocked, and your
+                                appointment will be attached to request{' '}
+                                <span className="font-semibold text-[#F6D27B]">
+                                    {req.request_number}
+                                </span>
+                                .
+                            </p>
+                        </div>
+
+                        <JourneyCard />
+                    </header>
+
+                    <section className="grid flex-1 gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+                        <motion.div
+                            className="appointment-reveal overflow-hidden rounded-[1.75rem] border border-white/14 bg-white/[0.13] shadow-[0_30px_100px_rgba(0,0,0,0.32)] backdrop-blur-2xl"
+                            whileHover={{ y: -2 }}
+                            transition={{ duration: 0.22 }}
+                        >
+                            <div className="flex flex-col gap-4 border-b border-white/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <div className="inline-flex items-center gap-2 rounded-full border border-[#0A6474]/30 bg-[#0A6474]/18 px-3 py-1 text-xs font-semibold text-cyan-100">
+                                        <MousePointerClick className="h-3.5 w-3.5" />
+                                        Click or drag a slot
+                                    </div>
+                                    <h2 className="mt-3 text-xl font-semibold text-white">
+                                        Appointment calendar
+                                    </h2>
+                                    <p className="mt-1 text-sm text-white/55">
+                                        Available hours: Monday to Friday, 08:30
+                                        — 16:30.
+                                    </p>
+                                </div>
+
+                                <div className="flex flex-wrap gap-2 text-xs font-semibold">
+                                    <span className="rounded-full border border-[#D4A23C]/35 bg-[#D4A23C]/12 px-3 py-1 text-[#F6D27B]">
+                                        Gold = selected
+                                    </span>
+                                    <span className="rounded-full border border-rose-300/20 bg-rose-400/10 px-3 py-1 text-rose-100">
+                                        Red = booked
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="p-3 sm:p-5">
+                                <div className="cim-calendar overflow-hidden rounded-[1.4rem] border border-white/10 bg-white/[0.96] p-3 text-[#061F39] shadow-sm">
+                                    <FullCalendar
+                                        plugins={[
+                                            dayGridPlugin,
+                                            timeGridPlugin,
+                                            interactionPlugin,
+                                        ]}
+                                        initialView="timeGridWeek"
+                                        headerToolbar={{
+                                            left: 'prev,next today',
+                                            center: 'title',
+                                            right: 'timeGridWeek,timeGridDay',
+                                        }}
+                                        selectable={true}
+                                        selectMirror={true}
+                                        select={handleSelect}
+                                        unselectAuto={false}
+                                        events={allEvents}
+                                        slotMinTime="08:30:00"
+                                        slotMaxTime="16:30:00"
+                                        slotDuration="00:30:00"
+                                        weekends={false}
+                                        allDaySlot={false}
+                                        height="auto"
+                                        nowIndicator={true}
+                                        validRange={{
+                                            start: new Date()
+                                                .toISOString()
+                                                .split('T')[0],
+                                        }}
+                                        eventDisplay="auto"
+                                        longPressDelay={0}
+                                        selectLongPressDelay={0}
+                                    />
+                                </div>
+                            </div>
+                        </motion.div>
+
+                        <aside className="space-y-5">
+                            <motion.div
+                                className="appointment-reveal overflow-hidden rounded-[1.75rem] border border-white/14 bg-white/[0.13] shadow-[0_30px_100px_rgba(0,0,0,0.28)] backdrop-blur-2xl"
+                                whileHover={{ y: -2 }}
+                                transition={{ duration: 0.22 }}
+                            >
+                                <div className="border-b border-white/10 px-5 py-4">
+                                    <div className="flex items-center gap-3">
+                                        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#D4A23C]/14 text-[#F6D27B]">
+                                            <UserRound className="h-5 w-5" />
+                                        </span>
+                                        <div>
+                                            <h3 className="font-semibold text-white">
+                                                Request summary
+                                            </h3>
+                                            <p className="text-xs text-white/48">
+                                                Verification dossier
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="grid gap-2 p-5">
+                                    <SummaryRow
+                                        icon={UserRound}
+                                        label="Full name"
+                                        value={req.user.name}
+                                    />
+                                    <SummaryRow
+                                        icon={Mail}
+                                        label="Email"
+                                        value={req.user.email}
+                                    />
+                                    <SummaryRow
+                                        icon={Phone}
+                                        label="Phone"
+                                        value={req.user.phone}
+                                    />
+                                    <SummaryRow
+                                        icon={BadgeCheck}
+                                        label="CIN"
+                                        value={req.customer_profile?.cin || '—'}
+                                    />
+                                    <SummaryRow
+                                        icon={Building2}
+                                        label="Branch"
+                                        value={
+                                            req.branch
+                                                ? `${req.branch.name}, ${req.branch.city}`
+                                                : '—'
+                                        }
+                                    />
+                                </div>
+                            </motion.div>
+
+                            <motion.div
+                                className="appointment-reveal overflow-hidden rounded-[1.75rem] border border-white/14 bg-white/[0.13] shadow-[0_30px_100px_rgba(0,0,0,0.28)] backdrop-blur-2xl"
+                                whileHover={{ y: -2 }}
+                                transition={{ duration: 0.22 }}
+                            >
+                                <div className="border-b border-white/10 px-5 py-4">
+                                    <div className="flex items-center gap-3">
+                                        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0A6474]/20 text-cyan-100">
+                                            <CalendarCheck className="h-5 w-5" />
+                                        </span>
+                                        <div>
+                                            <h3 className="font-semibold text-white">
+                                                Confirm booking
+                                            </h3>
+                                            <p className="text-xs text-white/48">
+                                                30-minute verification slot
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="p-5">
+                                    {selectedSlot && selectedShort ? (
+                                        <div className="rounded-[1.35rem] border border-[#D4A23C]/45 bg-[#D4A23C]/12 p-4">
+                                            <div className="flex items-start justify-between gap-3">
+                                                <div>
+                                                    <p className="text-xs font-bold tracking-[0.14em] text-[#F6D27B] uppercase">
+                                                        Selected appointment
+                                                    </p>
+                                                    <p className="mt-2 text-2xl font-semibold text-white">
+                                                        {selectedShort.day}
+                                                    </p>
+                                                    <p className="mt-1 flex items-center gap-2 text-sm font-semibold text-white/70">
+                                                        <Clock3 className="h-4 w-4 text-[#F6D27B]" />
+                                                        {selectedShort.time}
+                                                    </p>
+                                                </div>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={clearSelection}
+                                                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/12 bg-white/[0.08] text-white/75 transition hover:border-rose-300/35 hover:bg-rose-400/12 hover:text-rose-100"
+                                                    title="Clear selection"
+                                                >
+                                                    <Eraser className="h-4 w-4" />
+                                                </button>
+                                            </div>
+
+                                            <p className="mt-3 text-xs leading-5 text-white/55">
+                                                {selectedDisplay}
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <div className="rounded-[1.35rem] border border-dashed border-white/16 bg-white/[0.07] p-5 text-center">
+                                            <CalendarCheck className="mx-auto h-8 w-8 text-[#F6D27B]" />
+                                            <p className="mt-3 text-sm font-semibold text-white">
+                                                No slot selected
+                                            </p>
+                                            <p className="mt-1 text-xs leading-5 text-white/52">
+                                                Pick any available future time
+                                                slot from the calendar.
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {error && (
+                                        <div className="mt-3 rounded-2xl border border-rose-300/25 bg-rose-400/10 px-4 py-3 text-sm font-semibold text-rose-100">
+                                            {error}
+                                        </div>
+                                    )}
+
+                                    <button
+                                        type="button"
+                                        onClick={handleBook}
+                                        disabled={!selectedSlot || processing}
+                                        className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#D4A23C] px-5 text-sm font-bold text-[#061F39] shadow-lg shadow-[#D4A23C]/20 transition hover:-translate-y-0.5 hover:bg-[#e2b34a] disabled:cursor-not-allowed disabled:bg-white/18 disabled:text-white/40 disabled:shadow-none"
+                                    >
+                                        {processing ? (
+                                            <>
+                                                <RefreshCw className="h-4 w-4 animate-spin" />
+                                                Booking...
+                                            </>
+                                        ) : selectedSlot ? (
+                                            <>
+                                                Confirm appointment
+                                                <CheckCircle2 className="h-4 w-4" />
+                                            </>
+                                        ) : (
+                                            'Select a slot first'
+                                        )}
+                                    </button>
+                                </div>
+                            </motion.div>
+
+                            <div className="appointment-reveal rounded-[1.4rem] border border-white/12 bg-white/[0.08] p-4 backdrop-blur-xl">
+                                <div className="flex gap-3">
+                                    <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#F6D27B]" />
+                                    <p className="text-xs leading-6 text-white/58">
+                                        Your appointment only confirms the
+                                        verification visit. Account activation is
+                                        completed after staff review.
+                                    </p>
+                                </div>
+                            </div>
+                        </aside>
+                    </section>
+                </div>
+            </main>
 
             <style>{`
-                .cim-appt-layout {
-                    display: grid;
-                    grid-template-columns: minmax(0, 1fr) 340px;
-                    gap: 28px;
-                    align-items: start;
-                }
-                @media (max-width: 900px) {
-                    .cim-appt-layout { grid-template-columns: 1fr !important; }
-                }
                 .cim-calendar .fc {
                     font-family: 'Inter', sans-serif;
-                    --fc-border-color: ${CIM.border};
+                    --fc-border-color: rgba(209, 217, 218, 0.82);
                     --fc-button-bg-color: ${CIM.primary};
                     --fc-button-border-color: ${CIM.primary};
                     --fc-button-hover-bg-color: ${CIM.secondary};
                     --fc-button-hover-border-color: ${CIM.secondary};
                     --fc-button-active-bg-color: ${CIM.dark};
                     --fc-button-active-border-color: ${CIM.dark};
-                    --fc-today-bg-color: rgba(212, 162, 60, 0.06);
+                    --fc-today-bg-color: rgba(212, 162, 60, 0.08);
                     --fc-now-indicator-color: ${CIM.accent};
                     --fc-highlight-color: rgba(212, 162, 60, 0.18);
+                    color: ${CIM.dark};
                 }
+
+                .cim-calendar .fc .fc-toolbar {
+                    gap: 0.75rem;
+                    flex-wrap: wrap;
+                    margin-bottom: 0.8rem;
+                }
+
                 .cim-calendar .fc .fc-button {
-                    font-size: 0.78rem; font-weight: 500;
-                    border-radius: 8px; padding: 6px 14px;
+                    border-radius: 999px;
+                    padding: 0.45rem 0.85rem;
+                    font-size: 0.75rem;
+                    font-weight: 700;
+                    text-transform: capitalize;
+                    box-shadow: none;
                 }
+
                 .cim-calendar .fc .fc-toolbar-title {
-                    font-size: 1rem; font-weight: 600; color: ${CIM.primary};
+                    color: ${CIM.primary};
+                    font-size: 1rem;
+                    font-weight: 800;
+                    letter-spacing: -0.02em;
                 }
+
                 .cim-calendar .fc .fc-col-header-cell-cushion {
-                    color: ${CIM.primary}; font-weight: 600; font-size: 0.78rem;
+                    color: ${CIM.primary};
+                    font-size: 0.74rem;
+                    font-weight: 800;
+                    padding: 0.6rem 0.25rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.08em;
                 }
+
                 .cim-calendar .fc .fc-timegrid-slot-label-cushion {
-                    color: ${CIM.secondary}; font-size: 0.72rem;
+                    color: ${CIM.secondary};
+                    font-size: 0.72rem;
+                    font-weight: 700;
                 }
+
                 .cim-calendar .fc .fc-timegrid-slot {
                     cursor: pointer;
-                    height: 28px;
+                    height: 2rem;
                 }
+
                 .cim-calendar .fc .fc-timegrid-slot:hover {
-                    background: rgba(10, 100, 116, 0.05);
+                    background: rgba(10, 100, 116, 0.055);
                 }
-                /* Selected event styling */
+
+                .cim-calendar .fc .fc-timegrid-axis,
+                .cim-calendar .fc .fc-col-header-cell {
+                    background: rgba(247, 248, 250, 0.72);
+                }
+
                 .cim-calendar .fc .cim-selected-event {
                     background: ${CIM.accent} !important;
                     border-color: ${CIM.accent} !important;
-                    box-shadow: 0 0 0 3px rgba(212, 162, 60, 0.3), 0 4px 12px rgba(212, 162, 60, 0.25) !important;
-                    font-weight: 700 !important;
-                    font-size: 0.78rem !important;
-                    border-radius: 8px !important;
+                    border-radius: 0.75rem !important;
+                    box-shadow: 0 0 0 3px rgba(212, 162, 60, 0.3), 0 8px 20px rgba(212, 162, 60, 0.25) !important;
+                    color: ${CIM.dark} !important;
+                    font-size: 0.75rem !important;
+                    font-weight: 900 !important;
                     z-index: 10 !important;
                 }
-                /* Booked slot background */
+
                 .cim-calendar .fc .cim-booked-slot {
-                    opacity: 0.5;
+                    opacity: 0.62;
                 }
-                /* Selection mirror highlight */
+
                 .cim-calendar .fc .fc-highlight {
                     background: rgba(212, 162, 60, 0.18) !important;
                     border: 2px dashed ${CIM.accent} !important;
-                    border-radius: 6px;
+                    border-radius: 0.65rem;
+                }
+
+                @media (max-width: 900px) {
+                    .cim-calendar .fc .fc-toolbar {
+                        align-items: flex-start;
+                        flex-direction: column;
+                    }
                 }
             `}</style>
         </>
     );
 }
 
-/* Helper components */
-function SummaryRow({ label, value }: { label: string; value: string }) {
+function JourneyCard() {
     return (
-        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: `1px solid ${CIM.border}20` }}>
-            <span style={{ fontSize: '0.78rem', color: CIM.secondary, fontWeight: 500 }}>{label}</span>
-            <span style={{ fontSize: '0.78rem', color: CIM.dark, fontWeight: 600, textAlign: 'right', maxWidth: '60%', wordBreak: 'break-word' }}>{value}</span>
+        <div className="appointment-reveal w-full rounded-[1.5rem] border border-white/12 bg-white/[0.1] p-4 backdrop-blur-2xl lg:max-w-[420px]">
+            <div className="mb-3 flex items-center gap-2">
+                <Landmark className="h-4 w-4 text-[#F6D27B]" />
+                <p className="text-xs font-bold tracking-[0.16em] text-[#F6D27B] uppercase">
+                    Onboarding progress
+                </p>
+            </div>
+
+            <div className="grid grid-cols-4 gap-2">
+                {journeySteps.map((step, index) => {
+                    const active = index === 3;
+
+                    return (
+                        <div
+                            key={step.label}
+                            className={`rounded-2xl border px-2 py-3 text-center ${
+                                active
+                                    ? 'border-[#D4A23C]/55 bg-[#D4A23C]/12'
+                                    : 'border-emerald-300/20 bg-emerald-400/10'
+                            }`}
+                        >
+                            <span
+                                className={`mx-auto flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
+                                    active
+                                        ? 'bg-[#D4A23C] text-[#061F39]'
+                                        : 'bg-emerald-300 text-[#061F39]'
+                                }`}
+                            >
+                                {step.done ? '✓' : '4'}
+                            </span>
+                            <p
+                                className={`mt-2 text-[10px] font-bold ${
+                                    active ? 'text-[#F6D27B]' : 'text-emerald-100'
+                                }`}
+                            >
+                                {step.label}
+                            </p>
+                        </div>
+                    );
+                })}
+            </div>
         </div>
     );
 }
 
-function ActionIcon({ title, onClick, hoverBg, hoverBorder, icon }: {
-    title: string; onClick: () => void; hoverBg: string; hoverBorder: string; icon: React.ReactNode;
+function SummaryRow({
+    icon: Icon,
+    label,
+    value,
+}: {
+    icon: ComponentType<{ className?: string }>;
+    label: string;
+    value: ReactNode;
 }) {
     return (
-        <button
-            onClick={onClick}
-            title={title}
-            style={{
-                width: 30, height: 30, borderRadius: 8,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: CIM.white, border: `1px solid ${CIM.border}`,
-                cursor: 'pointer', transition: 'all 0.2s',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = hoverBg; e.currentTarget.style.borderColor = hoverBorder; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = CIM.white; e.currentTarget.style.borderColor = CIM.border; }}
-        >
-            {icon}
-        </button>
+        <div className="rounded-2xl border border-white/12 bg-white/[0.08] px-4 py-3">
+            <div className="flex items-start gap-3">
+                <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[#F6D27B]" />
+                <div className="min-w-0 flex-1">
+                    <p className="text-xs font-semibold tracking-[0.12em] text-white/42 uppercase">
+                        {label}
+                    </p>
+                    <p className="mt-1 break-words text-sm font-semibold text-white/82">
+                        {value}
+                    </p>
+                </div>
+            </div>
+        </div>
     );
 }

@@ -4,11 +4,10 @@ use App\Http\Controllers\Admin\AccountOpeningReviewController;
 use App\Http\Controllers\Admin\AppointmentAttendeesController;
 use App\Http\Controllers\Admin\AppointmentController;
 use App\Http\Controllers\Admin\AtmController;
-use App\Http\Controllers\Admin\BeneficiaryController;
 use App\Http\Controllers\Admin\BankAccountController;
 use App\Http\Controllers\Admin\CustomerController;
-use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DocumentReviewController;
+use App\Http\Controllers\Admin\Machrou3iController;
 use App\Http\Controllers\Admin\TransferReviewController;
 use App\Http\Controllers\Admin\UserRoleController;
 use App\Models\Document;
@@ -25,7 +24,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'role.admin'])->prefix('admin')->name('admin.')->group(function () {
 
     // ── Dashboard ──────────────────────────────────────────────────────────
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::redirect('/', '/admin/customers-dashboard')->name('dashboard');
 
     // ── Customers Dashboard (legacy appointment-attendees URL kept) ────────
     Route::get('/customers-dashboard', [AppointmentAttendeesController::class, 'index'])->name('customers-dashboard.index');
@@ -68,6 +67,11 @@ Route::middleware(['auth', 'role.admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/atms',         [AtmController::class, 'index'])->name('atms.index');
     Route::get('/atms/{atm}',   [AtmController::class, 'show'])->name('atms.show');
 
-    // ── Beneficiary Approvals ─────────────────────────────────────────────
-    Route::get('/beneficiaries', [BeneficiaryController::class, 'index'])->name('beneficiaries.index');
+    // Beneficiary approvals are obsolete; customers now validate CIM beneficiaries instantly.
+    Route::redirect('/beneficiaries', '/admin/customers-dashboard')->name('beneficiaries.index');
+
+    // ── Machrou3i Review Foundation ───────────────────────────────────────
+    Route::get('/machrou3i', [Machrou3iController::class, 'index'])->name('machrou3i.index');
+    Route::get('/machrou3i/{application}', [Machrou3iController::class, 'show'])->name('machrou3i.show');
+    Route::get('/machrou3i/{application}/documents/{document}/view', [Machrou3iController::class, 'viewDocument'])->name('machrou3i.documents.view');
 });
