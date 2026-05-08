@@ -1,3 +1,4 @@
+"use client"
 import { Head, Link } from '@inertiajs/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'motion/react';
@@ -18,12 +19,12 @@ import {
     Landmark,
     LockKeyhole,
     MapPin,
+    MessageCircle,
     PiggyBank,
     ReceiptText,
     Send,
     ShieldCheck,
     TrendingUp,
-    User,
     WalletCards,
 } from 'lucide-react';
 import { FlippableCreditCard } from '@/components/FlippableCreditCard';
@@ -31,7 +32,6 @@ import AppLogo from '@/components/app-logo';
 import CimChatbot from '@/components/customer/CimChatbot';
 import { dashboard } from '@/routes';
 import { atmMap, exchangeRates } from '@/routes/customer';
-import { edit as editProfile } from '@/routes/profile';
 
 const CIM = {
     primary: '#082F54',
@@ -232,50 +232,214 @@ function GlassPanel({ children, className = '' }) {
     );
 }
 
+function BalanceActivityChart({
+    data = [],
+    currentBalance = 0,
+    currency = 'MAD',
+    hasAccount = false,
+}) {
+    const hasActivity = hasAccount && data.length > 0;
+    const width = 640;
+    const height = 230;
+    const padding = 28;
+    const chartWidth = width - padding * 2;
+    const chartHeight = height - padding * 2;
+
+    const points = useMemo(() => {
+        if (!hasActivity) {
+            const y = padding + chartHeight / 2;
+
+            return [
+                { x: padding, y, balance: currentBalance, label: 'Current' },
+                {
+                    x: width - padding,
+                    y,
+                    balance: currentBalance,
+                    label: 'Current',
+                },
+            ];
+        }
+
+        const balances = data.map((point) => Number(point.balance || 0));
+        const min = Math.min(...balances);
+        const max = Math.max(...balances);
+        const spread = max - min || Math.max(Math.abs(max), 1);
+        const lower = min - spread * 0.12;
+        const upper = max + spread * 0.12;
+
+        return data.map((point, index) => {
+            const x =
+                padding +
+                (data.length === 1
+                    ? chartWidth / 2
+                    : (index / (data.length - 1)) * chartWidth);
+            const y =
+                padding +
+                chartHeight -
+                ((Number(point.balance || 0) - lower) / (upper - lower)) *
+                    chartHeight;
+
+            return {
+                x,
+                y,
+                balance: Number(point.balance || 0),
+                label: point.label || point.date,
+                direction: point.direction,
+                type: point.type,
+            };
+        });
+    }, [chartHeight, chartWidth, currentBalance, data, hasActivity]);
+
+    const linePath = points
+        .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`)
+        .join(' ');
+    const lastSvgPoint = points[points.length - 1];
+    const areaPath = `${linePath} L ${lastSvgPoint.x} ${height - padding} L ${points[0].x} ${height - padding} Z`;
+    const firstPoint = data[0];
+    const lastPoint = data[data.length - 1];
+
+    return (
+        <div className="relative overflow-hidden rounded-3xl border border-[#D1D9DA] bg-[#F7F8FA] p-4 dark:border-white/10 dark:bg-white/[0.035]">
+            <svg
+                viewBox={`0 0 ${width} ${height}`}
+                role="img"
+                aria-label="Running account balance chart"
+                className="h-64 w-full"
+                preserveAspectRatio="none"
+            >
+                <defs>
+                    <linearGradient id="balanceArea" x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="0%" stopColor="#0A6474" stopOpacity="0.34" />
+                        <stop offset="100%" stopColor="#0A6474" stopOpacity="0.02" />
+                    </linearGradient>
+                </defs>
+                {[0, 1, 2, 3].map((line) => {
+                    const y = padding + (line / 3) * chartHeight;
+
+                    return (
+                        <line
+                            key={line}
+                            x1={padding}
+                            x2={width - padding}
+                            y1={y}
+                            y2={y}
+                            stroke="currentColor"
+                            className="text-[#D1D9DA] dark:text-white/10"
+                            strokeDasharray="6 8"
+                        />
+                    );
+                })}
+                <path d={areaPath} fill="url(#balanceArea)" />
+                <path
+                    d={linePath}
+                    fill="none"
+                    stroke={hasActivity ? '#0A6474' : '#D4A23C'}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="4"
+                    vectorEffect="non-scaling-stroke"
+                />
+                {hasActivity
+                    ? points.map((point, index) => (
+                          <circle
+                              key={`${point.label}-${index}`}
+                              cx={point.x}
+                              cy={point.y}
+                              r="4.5"
+                              fill={
+                                  point.direction === 'out'
+                                      ? '#E11D48'
+                                      : '#059669'
+                              }
+                              stroke="#FFFFFF"
+                              strokeWidth="2"
+                              vectorEffect="non-scaling-stroke"
+                          />
+                      ))
+                    : null}
+            </svg>
+
+            <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <p className="text-sm font-semibold text-[#061F39] dark:text-white">
+                        {hasActivity
+                            ? 'Running balance from real account transactions'
+                            : hasAccount
+                              ? 'No activity yet'
+                              : 'No bank account yet'}
+                    </p>
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        {hasActivity
+                            ? `${firstPoint?.label || firstPoint?.date} to ${
+                                  lastPoint?.label || lastPoint?.date
+                              }`
+                            : hasAccount
+                              ? 'Current balance is shown as a flat baseline until your first completed transaction.'
+                              : 'Your running balance chart will appear after CIM activates your account.'}
+                    </p>
+                </div>
+                <div className="text-left sm:text-right">
+                    <p className="text-xs font-bold tracking-[0.16em] text-slate-400 uppercase">
+                        Current balance
+                    </p>
+                    <p className="mt-1 text-lg font-semibold text-[#061F39] dark:text-white">
+                        {hasAccount
+                            ? formatCurrency(currentBalance, currency)
+                            : 'Pending'}
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 
 export default function Dashboard({
     customer = {},
-    account = null,
-    card = null,
-    transactions = [],
+    account: accountProp = null,
+    accountSummary = null,
+    card: cardProp = null,
+    latestCard = null,
+    transactions: transactionProp = [],
+    recentTransactions = [],
+    balanceChart = [],
+    stats = {},
     summary = {},
 }) {
     const dashboardRef = useRef(null);
     const balanceRef = useRef(null);
     const [copied, setCopied] = useState(false);
+    const account = accountSummary ?? accountProp;
+    const card = latestCard ?? cardProp;
+    const transactions =
+        recentTransactions.length > 0 ? recentTransactions : transactionProp;
+    const chartPoints = Array.isArray(balanceChart) ? balanceChart : [];
+    const monthlyActivity =
+        stats?.monthlyActivity ?? summary?.monthly_activity ?? 0;
+    const securityLevel = stats?.securityLevel ?? summary?.security_level;
 
     const firstName =
         customer.first_name || customer.name?.split(' ')?.[0] || 'Customer';
     const accountStatus = account?.status || 'inactive';
     const cardStatus = card?.status || 'inactive';
-    const verificationStatus = customer.verification_status || 'verified';
+    const verificationStatus = customer.verification_status || 'none';
     const currency = account?.currency || 'MAD';
     const balance = Number(account?.balance || 0);
-    const transactionsTotal = transactions.reduce(
-        (total, transaction) => total + Number(transaction.amount || 0),
-        0,
-    );
 
     const quickActions = useMemo(
         () => [
             {
-                label: 'Transfer Money',
+                label: 'Transfers',
                 description: 'Send MAD to active beneficiaries',
                 href: '/customer/transfers',
                 icon: Send,
                 highlight: true,
             },
             {
-                label: 'Find ATM',
+                label: 'ATM Locator',
                 description: 'Map nearby service points',
                 href: atmMap(),
                 icon: MapPin,
-            },
-            {
-                label: 'Exchange Rates',
-                description: 'Convert MAD and global currencies',
-                href: exchangeRates(),
-                icon: ArrowRightLeft,
             },
             {
                 label: 'Bills & AutoPay',
@@ -289,6 +453,12 @@ export default function Dashboard({
                 icon: ReceiptText,
             },
             {
+                label: 'Exchange Rates',
+                description: 'Convert MAD and global currencies',
+                href: exchangeRates(),
+                icon: ArrowRightLeft,
+            },
+            {
                 label: 'Machrou3i',
                 description: summary?.machrou3i
                     ? `${summary.machrou3i.project_name} - ${titleCase(
@@ -299,10 +469,12 @@ export default function Dashboard({
                 icon: BriefcaseBusiness,
             },
             {
-                label: 'View Profile',
-                description: 'Manage your customer details',
-                href: editProfile(),
-                icon: User,
+                label: 'Chatbot Assistant',
+                description: 'Ask CIM Assistant for secure help',
+                onClick: () => {
+                    window.dispatchEvent(new CustomEvent('cim-chatbot:open'));
+                },
+                icon: MessageCircle,
             },
         ],
         [currency, summary?.machrou3i, summary?.upcoming_bill],
@@ -313,30 +485,45 @@ export default function Dashboard({
             {
                 icon: Landmark,
                 label: 'Active accounts',
-                value: summary?.active_accounts ?? (account ? 1 : 0),
+                value:
+                    stats?.activeAccounts ??
+                    summary?.active_accounts ??
+                    (account ? 1 : 0),
                 helper: 'Connected CIM banking products.',
             },
             {
                 icon: CreditCard,
                 label: 'Active cards',
-                value: summary?.active_cards ?? (card ? 1 : 0),
+                value:
+                    stats?.activeCards ??
+                    summary?.active_cards ??
+                    (card ? 1 : 0),
                 helper: 'Debit card and future virtual cards.',
             },
             {
                 icon: Gauge,
                 label: 'Monthly activity',
-                value: formatCompactCurrency(transactionsTotal, currency),
-                helper: `${transactions.length} latest visible movements.`,
-                trend: transactions.length ? 'Live' : null,
+                value: formatCompactCurrency(monthlyActivity, currency),
+                helper: 'Completed account movements this month.',
+                trend: monthlyActivity > 0 ? 'This month' : null,
             },
             {
                 icon: ShieldCheck,
                 label: 'Security level',
-                value: titleCase(verificationStatus),
+                value: titleCase(securityLevel || verificationStatus),
                 helper: 'Profile and account verification status.',
             },
         ],
-        [account, card, currency, summary, transactions.length, transactionsTotal, verificationStatus],
+        [
+            account,
+            card,
+            currency,
+            monthlyActivity,
+            securityLevel,
+            stats,
+            summary,
+            verificationStatus,
+        ],
     );
 
     useEffect(() => {
@@ -390,6 +577,12 @@ export default function Dashboard({
             return undefined;
         }
 
+        if (!account) {
+            balanceRef.current.textContent = 'No active account';
+
+            return undefined;
+        }
+
         const counter = { value: 0 };
         const tween = gsap.to(counter, {
             value: balance,
@@ -404,7 +597,7 @@ export default function Dashboard({
         });
 
         return () => tween.kill();
-    }, [balance, currency]);
+    }, [account, balance, currency]);
 
     const copyRib = async () => {
         if (!account?.rib) {
@@ -507,7 +700,9 @@ export default function Dashboard({
                                         ref={balanceRef}
                                         className="mt-4 text-4xl font-semibold tracking-tight sm:text-6xl"
                                     >
-                                        {formatCurrency(balance, currency)}
+                                        {account
+                                            ? formatCurrency(balance, currency)
+                                            : 'No active account'}
                                     </div>
                                     <p className="mt-4 max-w-xl text-sm leading-6 text-white/70">
                                         Real-time account overview with protected
@@ -525,10 +720,10 @@ export default function Dashboard({
                                         )}
                                     </p>
                                     <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
-                                        <div className="h-full w-[78%] rounded-full bg-gradient-to-r from-[#D4A23C] to-[#0A6474]" />
+                                        <div className="h-full w-full rounded-full bg-gradient-to-r from-[#D4A23C] to-[#0A6474]" />
                                     </div>
                                     <p className="mt-3 text-xs text-white/55">
-                                        Profile health score: 78%
+                                        Verification: {titleCase(verificationStatus)}
                                     </p>
                                 </div>
                             </div>
@@ -595,6 +790,20 @@ export default function Dashboard({
                             </div>
                         </GlassPanel>
                     </section>
+
+                    <GlassPanel className="dashboard-reveal p-5 sm:p-6">
+                        <SectionTitle
+                            eyebrow="Balance movement"
+                            title="Account activity chart"
+                            description="Running balance calculated from completed account transactions."
+                        />
+                        <BalanceActivityChart
+                            data={chartPoints}
+                            currentBalance={balance}
+                            currency={currency}
+                            hasAccount={Boolean(account)}
+                        />
+                    </GlassPanel>
 
                     <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
                         <GlassPanel className="dashboard-reveal p-5 sm:p-6">
@@ -707,6 +916,34 @@ export default function Dashboard({
                         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
                             {quickActions.map((action) => {
                                 const Icon = action.icon;
+                                const actionClass = `group relative flex h-full min-h-36 w-full flex-col justify-between overflow-hidden rounded-3xl border p-4 text-left shadow-[0_18px_45px_rgba(6,31,57,0.06)] transition hover:border-[#D4A23C] hover:shadow-[0_20px_60px_rgba(8,47,84,0.12)] dark:hover:border-[#D4A23C]/60 ${
+                                    action.highlight
+                                        ? 'border-[#082F54] bg-[#082F54] text-white dark:border-[#D4A23C]/30 dark:bg-[#D4A23C] dark:text-[#061F39]'
+                                        : 'border-[#D1D9DA] bg-white/85 text-[#061F39] backdrop-blur dark:border-white/10 dark:bg-white/[0.055] dark:text-white'
+                                }`;
+                                const content = (
+                                    <>
+                                        <div className="absolute -right-10 -top-10 h-24 w-24 rounded-full bg-[#D4A23C]/10 transition group-hover:scale-125" />
+                                        <span
+                                            className={`relative flex h-11 w-11 items-center justify-center rounded-2xl transition ${
+                                                action.highlight
+                                                    ? 'bg-white/12 text-[#D4A23C] dark:bg-[#061F39]/10 dark:text-[#061F39]'
+                                                    : 'bg-[#D4A23C]/15 text-[#D4A23C] group-hover:bg-[#D4A23C] group-hover:text-[#061F39]'
+                                            }`}
+                                        >
+                                            <Icon className="h-5 w-5" />
+                                        </span>
+                                        <span className="relative">
+                                            <span className="flex items-center justify-between gap-2 font-semibold">
+                                                {action.label}
+                                                <ChevronRight className="h-4 w-4 opacity-60 transition group-hover:translate-x-1" />
+                                            </span>
+                                            <span className="mt-1 block text-sm opacity-70">
+                                                {action.description}
+                                            </span>
+                                        </span>
+                                    </>
+                                );
 
                                 return (
                                     <motion.div
@@ -715,34 +952,22 @@ export default function Dashboard({
                                         whileTap={{ scale: 0.98 }}
                                         transition={{ duration: 0.18 }}
                                     >
-                                        <Link
-                                            href={action.href}
-                                            className={`group relative flex h-full min-h-36 flex-col justify-between overflow-hidden rounded-3xl border p-4 shadow-[0_18px_45px_rgba(6,31,57,0.06)] transition hover:border-[#D4A23C] hover:shadow-[0_20px_60px_rgba(8,47,84,0.12)] dark:hover:border-[#D4A23C]/60 ${
-                                                action.highlight
-                                                    ? 'border-[#082F54] bg-[#082F54] text-white dark:border-[#D4A23C]/30 dark:bg-[#D4A23C] dark:text-[#061F39]'
-                                                    : 'border-[#D1D9DA] bg-white/85 text-[#061F39] backdrop-blur dark:border-white/10 dark:bg-white/[0.055] dark:text-white'
-                                            }`}
-                                        >
-                                            <div className="absolute -right-10 -top-10 h-24 w-24 rounded-full bg-[#D4A23C]/10 transition group-hover:scale-125" />
-                                            <span
-                                                className={`relative flex h-11 w-11 items-center justify-center rounded-2xl transition ${
-                                                    action.highlight
-                                                        ? 'bg-white/12 text-[#D4A23C] dark:bg-[#061F39]/10 dark:text-[#061F39]'
-                                                        : 'bg-[#D4A23C]/15 text-[#D4A23C] group-hover:bg-[#D4A23C] group-hover:text-[#061F39]'
-                                                }`}
+                                        {action.onClick ? (
+                                            <button
+                                                type="button"
+                                                onClick={action.onClick}
+                                                className={actionClass}
                                             >
-                                                <Icon className="h-5 w-5" />
-                                            </span>
-                                            <span className="relative">
-                                                <span className="flex items-center justify-between gap-2 font-semibold">
-                                                    {action.label}
-                                                    <ChevronRight className="h-4 w-4 opacity-60 transition group-hover:translate-x-1" />
-                                                </span>
-                                                <span className="mt-1 block text-sm opacity-70">
-                                                    {action.description}
-                                                </span>
-                                            </span>
-                                        </Link>
+                                                {content}
+                                            </button>
+                                        ) : (
+                                            <Link
+                                                href={action.href}
+                                                className={actionClass}
+                                            >
+                                                {content}
+                                            </Link>
+                                        )}
                                     </motion.div>
                                 );
                             })}
@@ -892,6 +1117,9 @@ export default function Dashboard({
                                                             {formatDateTime(
                                                                 transaction.occurred_at,
                                                             )}
+                                                            {transaction.reference
+                                                                ? ` - ${transaction.reference}`
+                                                                : ''}
                                                         </p>
                                                     </div>
                                                     <StatusBadge

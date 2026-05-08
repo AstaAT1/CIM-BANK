@@ -309,16 +309,6 @@ export default function AdminMachrou3iShow({ application = {} }) {
                         Back to Machrou3i Review
                     </Link>
 
-                    {flash.success && (
-                        <motion.div
-                            className="admin-show-reveal rounded-2xl border border-emerald-300/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-700 dark:text-emerald-200"
-                            initial={{ scale: 0.98 }}
-                            animate={{ scale: 1 }}
-                        >
-                            {flash.success}
-                        </motion.div>
-                    )}
-
                     <Header
                         application={application}
                         project={project}

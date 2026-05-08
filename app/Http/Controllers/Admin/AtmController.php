@@ -83,6 +83,7 @@ class AtmController extends Controller
             'completed_withdrawals' => $atm->withdrawals()->where('status', 'completed')->count(),
             'total_cash_loaded'     => $atm->cashMovements()->where('type', 'load')->sum('amount'),
             'total_cash_withdrawn'  => $atm->cashMovements()->where('type', 'withdrawal')->sum('amount'),
+            'total_cash_deposited'  => $atm->cashMovements()->where('type', 'deposit')->sum('amount'),
             'fill_percentage'       => $atm->fill_percentage,
         ];
 

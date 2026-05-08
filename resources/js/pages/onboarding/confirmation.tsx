@@ -18,6 +18,7 @@ import { useEffect, useRef } from 'react';
 import type { ComponentType, ReactNode } from 'react';
 import { motion } from 'motion/react';
 import gsap from 'gsap';
+import ThemeToggle from '@/components/theme-toggle';
 import background from '../customer/images/CIM.png';
 
 type ConfirmationProps = {
@@ -131,17 +132,21 @@ export default function Confirmation({ request: req }: ConfirmationProps) {
 
             <main
                 ref={pageRef}
-                className="relative min-h-svh overflow-x-hidden bg-[#061F39] text-white"
+                className="relative min-h-svh overflow-x-hidden bg-[#F7F8FA] text-[#061F39] dark:bg-[#061F39] dark:text-white"
             >
+                <div className="fixed top-5 right-5 z-50">
+                    <ThemeToggle />
+                </div>
+
                 <div className="fixed inset-0">
                     <img
                         src={background}
                         alt="CIM Bank"
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-cover opacity-[0.08] dark:opacity-100"
                     />
-                    <div className="absolute inset-0 bg-[#061F39]/62" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#061F39]/94 via-[#061F39]/68 to-[#061F39]/34" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#061F39]/84 via-transparent to-[#061F39]/22" />
+                    <div className="absolute inset-0 bg-[#F7F8FA]/84 dark:bg-[#061F39]/62" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#F7F8FA]/96 via-white/84 to-[#F7F8FA]/70 dark:from-[#061F39]/94 dark:via-[#061F39]/68 dark:to-[#061F39]/34" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#F7F8FA]/86 via-transparent to-white/38 dark:from-[#061F39]/84 dark:via-transparent dark:to-[#061F39]/22" />
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(212,162,60,0.25),transparent_28%),radial-gradient(circle_at_88%_18%,rgba(10,100,116,0.22),transparent_34%)]" />
                 </div>
 
@@ -162,11 +167,11 @@ export default function Confirmation({ request: req }: ConfirmationProps) {
                                 Onboarding completed
                             </div>
 
-                            <h1 className="mt-4 max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
+                            <h1 className="mt-4 max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-[#061F39] dark:text-white sm:text-4xl lg:text-5xl">
                                 Your account request is recorded.
                             </h1>
 
-                            <p className="mt-3 max-w-2xl text-sm leading-7 text-white/68">
+                            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 dark:text-white/68">
                                 CIM received your account opening request. Visit
                                 the selected branch at your appointment time for
                                 identity verification and account activation.
@@ -178,22 +183,22 @@ export default function Confirmation({ request: req }: ConfirmationProps) {
 
                     <section className="grid flex-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_380px]">
                         <motion.div
-                            className="confirmation-reveal overflow-hidden rounded-[1.75rem] border border-white/14 bg-white/[0.13] shadow-[0_30px_100px_rgba(0,0,0,0.32)] backdrop-blur-2xl"
+                            className="confirmation-reveal overflow-hidden rounded-[1.75rem] border border-[#D1D9DA]/80 bg-white/86 text-[#061F39] shadow-[0_30px_90px_rgba(6,31,57,0.12)] backdrop-blur-2xl dark:border-white/14 dark:bg-white/[0.13] dark:text-white dark:shadow-[0_30px_100px_rgba(0,0,0,0.32)]"
                             whileHover={{ y: -2 }}
                             transition={{ duration: 0.22 }}
                         >
-                            <div className="relative overflow-hidden border-b border-white/10 px-5 py-6 text-center sm:px-8">
+                            <div className="relative overflow-hidden border-b border-[#D1D9DA]/70 px-5 py-6 text-center dark:border-white/10 sm:px-8">
                                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(212,162,60,0.18),transparent_35%)]" />
 
                                 <div className="success-check relative mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#D4A23C] text-[#061F39] shadow-[0_18px_55px_rgba(212,162,60,0.28)]">
                                     <CheckCircle2 className="h-10 w-10" />
                                 </div>
 
-                                <h2 className="relative mt-5 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+                                <h2 className="relative mt-5 text-2xl font-semibold tracking-tight text-[#061F39] dark:text-white sm:text-3xl">
                                     Request recorded successfully
                                 </h2>
 
-                                <p className="relative mx-auto mt-3 max-w-xl text-sm leading-7 text-white/62">
+                                <p className="relative mx-auto mt-3 max-w-xl text-sm leading-7 text-slate-500 dark:text-white/62">
                                     Your request is now pending CIM staff
                                     verification. Keep your appointment details
                                     and bring the required documents to the
@@ -210,10 +215,10 @@ export default function Confirmation({ request: req }: ConfirmationProps) {
                                             <FileCheck2 className="h-5 w-5" />
                                         </span>
                                         <div>
-                                            <h3 className="font-semibold text-white">
+                                            <h3 className="font-semibold text-[#061F39] dark:text-white">
                                                 Request details
                                             </h3>
-                                            <p className="text-xs text-white/48">
+                                            <p className="text-xs text-slate-500 dark:text-white/48">
                                                 Summary of your onboarding file
                                             </p>
                                         </div>
@@ -281,20 +286,20 @@ export default function Confirmation({ request: req }: ConfirmationProps) {
 
                                         {appointmentShort ? (
                                             <>
-                                                <p className="mt-3 text-3xl font-semibold text-white">
+                                                <p className="mt-3 text-3xl font-semibold text-[#061F39] dark:text-white">
                                                     {appointmentShort.day}
                                                 </p>
-                                                <p className="mt-1 text-lg font-semibold text-white/72">
+                                                <p className="mt-1 text-lg font-semibold text-slate-600 dark:text-white/72">
                                                     {appointmentShort.time}
                                                 </p>
                                             </>
                                         ) : (
-                                            <p className="mt-3 text-xl font-semibold text-white">
+                                            <p className="mt-3 text-xl font-semibold text-[#061F39] dark:text-white">
                                                 Not scheduled
                                             </p>
                                         )}
 
-                                        <p className="mt-3 text-xs leading-5 text-white/55">
+                                        <p className="mt-3 text-xs leading-5 text-slate-500 dark:text-white/55">
                                             Please arrive 10 minutes early and
                                             bring your original CIN document.
                                         </p>
@@ -323,20 +328,20 @@ export default function Confirmation({ request: req }: ConfirmationProps) {
 
                         <aside className="space-y-5">
                             <motion.div
-                                className="confirmation-reveal overflow-hidden rounded-[1.75rem] border border-white/14 bg-white/[0.13] shadow-[0_30px_100px_rgba(0,0,0,0.28)] backdrop-blur-2xl"
+                                className="confirmation-reveal overflow-hidden rounded-[1.75rem] border border-[#D1D9DA]/80 bg-white/86 text-[#061F39] shadow-[0_30px_90px_rgba(6,31,57,0.1)] backdrop-blur-2xl dark:border-white/14 dark:bg-white/[0.13] dark:text-white dark:shadow-[0_30px_100px_rgba(0,0,0,0.28)]"
                                 whileHover={{ y: -2 }}
                                 transition={{ duration: 0.22 }}
                             >
-                                <div className="border-b border-white/10 px-5 py-4">
+                                <div className="border-b border-[#D1D9DA]/70 px-5 py-4 dark:border-white/10">
                                     <div className="flex items-center gap-3">
-                                        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0A6474]/20 text-cyan-100">
+                                        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0A6474]/10 text-[#0A6474] dark:bg-[#0A6474]/20 dark:text-cyan-100">
                                             <ShieldCheck className="h-5 w-5" />
                                         </span>
                                         <div>
-                                            <h3 className="font-semibold text-white">
+                                            <h3 className="font-semibold text-[#061F39] dark:text-white">
                                                 What happens next?
                                             </h3>
-                                            <p className="text-xs text-white/48">
+                                            <p className="text-xs text-slate-500 dark:text-white/48">
                                                 Before account activation
                                             </p>
                                         </div>
@@ -368,23 +373,23 @@ export default function Confirmation({ request: req }: ConfirmationProps) {
                             </motion.div>
 
                             <motion.div
-                                className="confirmation-reveal rounded-[1.75rem] border border-white/14 bg-white/[0.13] p-5 shadow-[0_30px_100px_rgba(0,0,0,0.24)] backdrop-blur-2xl"
+                                className="confirmation-reveal rounded-[1.75rem] border border-[#D1D9DA]/80 bg-white/86 p-5 text-[#061F39] shadow-[0_30px_90px_rgba(6,31,57,0.1)] backdrop-blur-2xl dark:border-white/14 dark:bg-white/[0.13] dark:text-white dark:shadow-[0_30px_100px_rgba(0,0,0,0.24)]"
                                 whileHover={{ y: -2 }}
                                 transition={{ duration: 0.22 }}
                             >
                                 <div className="flex gap-3">
                                     <Landmark className="mt-0.5 h-5 w-5 shrink-0 text-[#F6D27B]" />
                                     <div>
-                                        <h3 className="font-semibold text-white">
+                                        <h3 className="font-semibold text-[#061F39] dark:text-white">
                                             Branch information
                                         </h3>
-                                        <p className="mt-2 text-sm leading-6 text-white/58">
+                                        <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-white/58">
                                             {req.branch
                                                 ? `${req.branch.name}, ${req.branch.city}`
                                                 : 'No branch selected'}
                                         </p>
                                         {req.branch?.address && (
-                                            <p className="mt-1 text-xs leading-5 text-white/45">
+                                            <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-white/45">
                                                 {req.branch.address}
                                             </p>
                                         )}
@@ -401,7 +406,7 @@ export default function Confirmation({ request: req }: ConfirmationProps) {
                                     href="/dashboard"
                                     className="inline-flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-[#D4A23C] px-5 text-sm font-bold text-[#061F39] shadow-lg shadow-[#D4A23C]/20 transition hover:bg-[#e2b34a]"
                                 >
-                                    Go to dashboard
+                                    Go to home
                                     <ArrowRight className="h-4 w-4" />
                                 </Link>
                             </motion.div>
@@ -415,7 +420,7 @@ export default function Confirmation({ request: req }: ConfirmationProps) {
 
 function JourneyCard() {
     return (
-        <div className="confirmation-reveal w-full rounded-[1.5rem] border border-white/12 bg-white/[0.1] p-4 backdrop-blur-2xl lg:max-w-[420px]">
+        <div className="confirmation-reveal w-full rounded-[1.5rem] border border-[#D1D9DA]/80 bg-white/80 p-4 backdrop-blur-2xl dark:border-white/12 dark:bg-white/[0.1] lg:max-w-[420px]">
             <div className="mb-3 flex items-center gap-2">
                 <Landmark className="h-4 w-4 text-[#F6D27B]" />
                 <p className="text-xs font-bold tracking-[0.16em] text-[#F6D27B] uppercase">
@@ -432,7 +437,7 @@ function JourneyCard() {
                         <span className="mx-auto flex h-7 w-7 items-center justify-center rounded-full bg-emerald-300 text-xs font-bold text-[#061F39]">
                             ✓
                         </span>
-                        <p className="mt-2 text-[10px] font-bold text-emerald-100">
+                        <p className="mt-2 text-[10px] font-bold text-emerald-700 dark:text-emerald-100">
                             {label}
                         </p>
                     </div>
@@ -458,16 +463,16 @@ function InfoTile({
             className={`rounded-2xl border px-4 py-3 ${
                 highlight
                     ? 'border-[#D4A23C]/35 bg-[#D4A23C]/10'
-                    : 'border-white/12 bg-white/[0.08]'
+                    : 'border-[#D1D9DA]/80 bg-[#F7F8FA]/80 dark:border-white/12 dark:bg-white/[0.08]'
             }`}
         >
             <div className="flex items-start gap-3">
                 <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[#F6D27B]" />
                 <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold tracking-[0.12em] text-white/42 uppercase">
+                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-400 uppercase dark:text-white/42">
                         {label}
                     </p>
-                    <p className="mt-1 break-words text-sm font-semibold text-white/82">
+                    <p className="mt-1 break-words text-sm font-semibold text-[#061F39] dark:text-white/82">
                         {value}
                     </p>
                 </div>
@@ -487,8 +492,8 @@ function StatusBadge({
 }) {
     const tones = {
         gold: 'border-[#D4A23C]/35 bg-[#D4A23C]/12 text-[#F6D27B]',
-        teal: 'border-cyan-200/20 bg-cyan-200/10 text-cyan-100',
-        navy: 'border-white/12 bg-white/[0.08] text-white/70',
+        teal: 'border-cyan-500/20 bg-cyan-500/10 text-[#0A6474] dark:border-cyan-200/20 dark:bg-cyan-200/10 dark:text-cyan-100',
+        navy: 'border-[#D1D9DA]/80 bg-[#F7F8FA]/80 text-slate-600 dark:border-white/12 dark:bg-white/[0.08] dark:text-white/70',
     };
 
     return (
@@ -513,14 +518,14 @@ function NextStep({
     text: string;
 }) {
     return (
-        <div className="rounded-2xl border border-white/12 bg-white/[0.08] p-4">
+        <div className="rounded-2xl border border-[#D1D9DA]/80 bg-[#F7F8FA]/80 p-4 dark:border-white/12 dark:bg-white/[0.08]">
             <div className="flex gap-3">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#D4A23C] text-xs font-bold text-[#061F39]">
                     {number}
                 </span>
                 <div>
-                    <p className="text-sm font-semibold text-white">{title}</p>
-                    <p className="mt-1 text-xs leading-5 text-white/50">
+                    <p className="text-sm font-semibold text-[#061F39] dark:text-white">{title}</p>
+                    <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-white/50">
                         {text}
                     </p>
                 </div>

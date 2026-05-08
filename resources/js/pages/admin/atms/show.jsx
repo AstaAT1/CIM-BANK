@@ -223,9 +223,22 @@ function CashMovementTable({ rows }) {
                 const tone =
                     movement.type === 'load'
                         ? '#0A6474'
+                        : movement.type === 'deposit'
+                          ? '#15803D'
                         : movement.type === 'withdrawal'
                           ? '#C2413B'
                           : '#8A620E';
+                const label =
+                    movement.type === 'load'
+                        ? 'Admin cash load'
+                        : movement.type === 'deposit'
+                          ? 'Customer deposit'
+                          : movement.type === 'withdrawal'
+                            ? 'Customer withdrawal'
+                            : movement.type;
+                const actor =
+                    movement.admin_user?.name ??
+                    (movement.type === 'load' ? 'Admin' : 'Customer');
 
                 return (
                     <tr
@@ -240,7 +253,7 @@ function CashMovementTable({ rows }) {
                                     color: tone,
                                 }}
                             >
-                                {movement.type}
+                                {label}
                             </span>
                         </td>
                         <td className="px-4 py-4 font-semibold text-[#061F39]">
@@ -251,7 +264,7 @@ function CashMovementTable({ rows }) {
                             {formatMad(movement.cash_after)}
                         </td>
                         <td className="px-4 py-4 text-slate-600">
-                            {movement.admin_user?.name ?? 'System'}
+                            {actor}
                         </td>
                         <td className="px-4 py-4 text-slate-500">
                             {formatDate(movement.created_at)}

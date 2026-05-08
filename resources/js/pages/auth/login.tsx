@@ -15,6 +15,7 @@ import gsap from 'gsap';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
+import ThemeToggle from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -85,19 +86,23 @@ export default function Login({
 
             <main
                 ref={pageRef}
-                className="relative h-svh overflow-hidden bg-[#061F39] text-white"
+                className="relative h-svh overflow-hidden bg-[#F7F8FA] text-[#061F39] dark:bg-[#061F39] dark:text-white"
             >
+                <div className="fixed top-5 right-5 z-50">
+                    <ThemeToggle />
+                </div>
+
                 {/* Real full-screen background image */}
                 <div className="absolute inset-0">
                     <img
                         src={background}
                         alt="CIM Bank"
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-cover opacity-[0.08] dark:opacity-100"
                     />
 
-                    <div className="absolute inset-0 bg-[#061F39]/58" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#061F39]/92 via-[#061F39]/62 to-[#061F39]/28" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#061F39]/76 via-transparent to-[#061F39]/22" />
+                    <div className="absolute inset-0 bg-[#F7F8FA]/78 dark:bg-[#061F39]/58" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#F7F8FA]/96 via-white/84 to-[#F7F8FA]/68 dark:from-[#061F39]/92 dark:via-[#061F39]/62 dark:to-[#061F39]/28" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#F7F8FA]/82 via-transparent to-white/40 dark:from-[#061F39]/76 dark:via-transparent dark:to-[#061F39]/22" />
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(212,162,60,0.26),transparent_28%),radial-gradient(circle_at_88%_18%,rgba(10,100,116,0.22),transparent_34%)]" />
                 </div>
 
@@ -117,11 +122,11 @@ export default function Login({
                             Credit Intelligence Mizan
                         </div>
 
-                        <h1 className="mt-6 max-w-3xl text-5xl font-semibold leading-[0.95] tracking-tight text-white xl:text-6xl">
+                        <h1 className="mt-6 max-w-3xl text-5xl font-semibold leading-[0.95] tracking-tight text-[#061F39] dark:text-white xl:text-6xl">
                             Secure access to your CIM banking space.
                         </h1>
 
-                        <p className="mt-5 max-w-xl text-base leading-8 text-white/72">
+                        <p className="mt-5 max-w-xl text-base leading-8 text-slate-600 dark:text-white/72">
                             Manage your account, transfers, bills, exchange
                             rates, ATM locator, Machrou3i and CIM assistant from
                             one protected dashboard.
@@ -131,7 +136,7 @@ export default function Login({
                             {highlights.map((item) => (
                                 <span
                                     key={item}
-                                    className="rounded-full border border-white/12 bg-white/10 px-4 py-2 text-xs font-semibold text-white/82 backdrop-blur-xl"
+                                    className="rounded-full border border-[#D1D9DA]/80 bg-white/70 px-4 py-2 text-xs font-semibold text-slate-600 backdrop-blur-xl dark:border-white/12 dark:bg-white/10 dark:text-white/82"
                                 >
                                     {item}
                                 </span>
@@ -167,11 +172,11 @@ export default function Login({
                         </div>
 
                         <motion.div
-                            className="overflow-hidden rounded-[1.75rem] border border-white/14 bg-white/[0.13] shadow-[0_30px_100px_rgba(0,0,0,0.32)] backdrop-blur-2xl"
+                            className="overflow-hidden rounded-[1.75rem] border border-[#D1D9DA]/80 bg-white/88 text-[#061F39] shadow-[0_30px_90px_rgba(6,31,57,0.12)] backdrop-blur-2xl dark:border-white/14 dark:bg-white/[0.13] dark:text-white dark:shadow-[0_30px_100px_rgba(0,0,0,0.32)]"
                             whileHover={{ y: -2 }}
                             transition={{ duration: 0.22 }}
                         >
-                            <div className="border-b border-white/10 px-6 py-5 sm:px-8">
+                            <div className="border-b border-[#D1D9DA]/70 px-6 py-5 dark:border-white/10 sm:px-8">
                                 <div className="hidden lg:block">
                                     <img
                                         src="/logo_twil.png"
@@ -186,18 +191,18 @@ export default function Login({
                                         Secure login
                                     </div>
 
-                                    <h2 className="mt-4 text-2xl font-semibold tracking-tight text-white">
+                                    <h2 className="mt-4 text-2xl font-semibold tracking-tight text-[#061F39] dark:text-white">
                                         Log in to your account
                                     </h2>
 
-                                    <p className="mt-2 text-sm leading-6 text-white/62">
+                                    <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-white/62">
                                         Enter your credentials to continue to
                                         your CIM dashboard.
                                     </p>
                                 </div>
 
                                 {status && (
-                                    <div className="mt-4 rounded-2xl border border-emerald-300/25 bg-emerald-400/10 px-4 py-3 text-sm font-semibold text-emerald-100">
+                                    <div className="mt-4 rounded-2xl border border-emerald-300/35 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-700 dark:text-emerald-100">
                                         {status}
                                     </div>
                                 )}
@@ -215,13 +220,13 @@ export default function Login({
                                                 <div className="grid gap-2">
                                                     <Label
                                                         htmlFor="email"
-                                                        className="text-sm font-semibold text-white"
+                                                        className="text-sm font-semibold text-[#061F39] dark:text-white"
                                                     >
                                                         Email address
                                                     </Label>
 
                                                     <div className="relative">
-                                                        <Mail className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-white/45" />
+                                                        <Mail className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-white/45" />
                                                         <Input
                                                             id="email"
                                                             type="email"
@@ -231,7 +236,7 @@ export default function Login({
                                                             tabIndex={1}
                                                             autoComplete="email"
                                                             placeholder="email@example.com"
-                                                            className="h-12 rounded-2xl border-white/14 bg-white/12 pl-10 text-white shadow-none outline-none transition placeholder:text-white/42 focus-visible:ring-[#D4A23C]/35"
+                                                            className="h-12 rounded-2xl border-[#D1D9DA] bg-white pl-10 text-[#061F39] shadow-none outline-none transition placeholder:text-slate-400 focus-visible:ring-[#D4A23C]/35 dark:border-white/14 dark:bg-white/12 dark:text-white dark:placeholder:text-white/42"
                                                         />
                                                     </div>
                                                     <InputError message={errors.email} />
@@ -241,7 +246,7 @@ export default function Login({
                                                     <div className="flex items-center">
                                                         <Label
                                                             htmlFor="password"
-                                                            className="text-sm font-semibold text-white"
+                                                            className="text-sm font-semibold text-[#061F39] dark:text-white"
                                                         >
                                                             Password
                                                         </Label>
@@ -256,7 +261,7 @@ export default function Login({
                                                         tabIndex={2}
                                                         autoComplete="current-password"
                                                         placeholder="Password"
-                                                        className="h-12 rounded-2xl border-white/14 bg-white/12 text-white shadow-none outline-none transition placeholder:text-white/42 focus-visible:ring-[#D4A23C]/35"
+                                                        className="h-12 rounded-2xl border-[#D1D9DA] bg-white text-[#061F39] shadow-none outline-none transition placeholder:text-slate-400 focus-visible:ring-[#D4A23C]/35 dark:border-white/14 dark:bg-white/12 dark:text-white dark:placeholder:text-white/42"
                                                     />
                                                     <InputError message={errors.password} />
                                                 </div>
@@ -279,12 +284,12 @@ export default function Login({
                                             </div>
 
                                             {canRegister && (
-                                                <div className="rounded-2xl border border-white/12 bg-white/[0.08] px-4 py-3 text-center text-sm text-white/65">
+                                                <div className="rounded-2xl border border-[#D1D9DA]/80 bg-[#F7F8FA]/85 px-4 py-3 text-center text-sm text-slate-600 dark:border-white/12 dark:bg-white/[0.08] dark:text-white/65">
                                                     Don't have an account?{' '}
                                                     <TextLink
                                                         href={register()}
                                                         tabIndex={5}
-                                                        className="font-bold text-[#F6D27B] hover:text-white"
+                                                        className="font-bold text-[#0A6474] hover:text-[#D4A23C] dark:text-[#F6D27B] dark:hover:text-white"
                                                     >
                                                         Sign up
                                                     </TextLink>
@@ -296,7 +301,7 @@ export default function Login({
                             </div>
                         </motion.div>
 
-                        <p className="login-reveal mt-4 text-center text-xs leading-6 text-white/58">
+                        <p className="login-reveal mt-4 text-center text-xs leading-6 text-slate-500 dark:text-white/58">
                             Protected by CIM secure access. Never share your
                             password or verification details.
                         </p>
@@ -317,10 +322,10 @@ function TrustCard({
     text: string;
 }) {
     return (
-        <div className="rounded-2xl border border-white/12 bg-white/10 p-4 backdrop-blur-xl">
+        <div className="rounded-2xl border border-[#D1D9DA]/75 bg-white/70 p-4 backdrop-blur-xl dark:border-white/12 dark:bg-white/10">
             <Icon className="mb-3 h-5 w-5 text-[#F6D27B]" />
-            <p className="text-sm font-semibold text-white">{title}</p>
-            <p className="mt-1 text-xs text-white/55">{text}</p>
+            <p className="text-sm font-semibold text-[#061F39] dark:text-white">{title}</p>
+            <p className="mt-1 text-xs text-slate-500 dark:text-white/55">{text}</p>
         </div>
     );
 }

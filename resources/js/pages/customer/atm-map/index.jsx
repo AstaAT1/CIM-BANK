@@ -32,6 +32,7 @@ import {
     useMap,
     useMapEvents,
 } from 'react-leaflet';
+import { toast } from 'sonner';
 
 /* ─────────────────────────────────────────── palette ── */
 const CIM = {
@@ -106,6 +107,9 @@ function cashFill(atm) {
 }
 function isWithdrawable(atm) {
     return atm?.is_active && !['empty', 'out_of_service'].includes(atm.status);
+}
+function isDepositable(atm) {
+    return atm?.is_active && !['out_of_service', 'maintenance'].includes(atm.status);
 }
 function atmPosition(atm) {
     const lat = asNumber(atm?.latitude),
@@ -625,13 +629,15 @@ function SelectedAtmPanel({
     onClose,
     routeDistance,
 }) {
-    const available = atm ? isWithdrawable(atm) : false;
+    const withdrawAvailable = atm ? isWithdrawable(atm) : false;
+    const depositAvailable = atm ? isDepositable(atm) : false;
     const form = useForm({
         atm_id: atm?.id ?? '',
         bank_account_id: bankAccounts[0]?.id ?? '',
         amount: '',
     });
     const [expanded, setExpanded] = useState(false);
+    const [mode, setMode] = useState('withdraw');
 
     useEffect(() => {
         if (atm) {
@@ -641,15 +647,35 @@ function SelectedAtmPanel({
         }
     }, [atm?.id]);
 
+    useEffect(() => {
+        form.clearErrors();
+        form.reset('amount');
+    }, [mode]);
+
     const selectedAccount = bankAccounts.find(
         (a) => String(a.id) === String(form.data.bank_account_id),
     );
 
+    const activeAvailable =
+        mode === 'deposit' ? depositAvailable : withdrawAvailable;
+
     const submit = (e) => {
         e.preventDefault();
-        form.post('/backend/customer/atm-withdrawals', {
+        const endpoint =
+            mode === 'deposit'
+                ? `/backend/customer/atms/${atm.id}/deposit`
+                : '/backend/customer/atm-withdrawals';
+
+        form.post(endpoint, {
             preserveScroll: true,
-            onSuccess: () => form.reset('amount'),
+            onSuccess: () => {
+                form.reset('amount');
+                toast.success(
+                    mode === 'deposit'
+                        ? 'Cash deposited successfully. Your account balance has been updated.'
+                        : 'Withdrawal completed successfully.',
+                );
+            },
         });
     };
 
@@ -737,17 +763,17 @@ function SelectedAtmPanel({
                         <span
                             className="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold"
                             style={{
-                                background: available
+                                background: depositAvailable
                                     ? '#0F2' + '11'
                                     : '#F0011122',
-                                borderColor: available
+                                borderColor: depositAvailable
                                     ? '#22c55e33'
                                     : '#ef444433',
-                                color: available ? '#22c55e' : '#ef4444',
+                                color: depositAvailable ? '#22c55e' : '#ef4444',
                             }}
                         >
                             <ShieldCheck className="size-3" />
-                            {available ? 'Available' : 'Unavailable'}
+                            {depositAvailable ? 'In service' : 'Unavailable'}
                         </span>
                     </div>
 
@@ -822,22 +848,36 @@ function SelectedAtmPanel({
                         </p>
                     </div>
 
-                    {/* success */}
-                    {form.wasSuccessful && (
-                        <div
-                            className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold"
-                            style={{
-                                background: '#22c55e18',
-                                border: '1px solid #22c55e33',
-                                color: '#22c55e',
-                            }}
-                        >
-                            <CheckCircle2 className="size-4" /> Withdrawal
-                            completed successfully.
-                        </div>
-                    )}
+                    <div
+                        className="grid grid-cols-2 gap-2 rounded-xl p-1"
+                        style={{
+                            background: 'rgba(255,255,255,0.05)',
+                            border: '1px solid rgba(255,255,255,0.07)',
+                        }}
+                    >
+                        {[
+                            { key: 'withdraw', label: 'Withdraw Cash', icon: Banknote },
+                            { key: 'deposit', label: 'Deposit Cash', icon: Plus },
+                        ].map(({ key, label, icon: Icon }) => (
+                            <button
+                                key={key}
+                                type="button"
+                                onClick={() => setMode(key)}
+                                className="flex h-10 items-center justify-center gap-2 rounded-lg text-xs font-bold transition"
+                                style={{
+                                    background:
+                                        mode === key ? CIM.accent : 'transparent',
+                                    color:
+                                        mode === key ? CIM.dark : 'rgb(203,213,225)',
+                                }}
+                            >
+                                <Icon className="size-4" />
+                                {label}
+                            </button>
+                        ))}
+                    </div>
 
-                    {/* withdrawal form */}
+                    {/* transaction form */}
                     <form
                         onSubmit={submit}
                         className="space-y-4 rounded-xl p-4"
@@ -858,10 +898,14 @@ function SelectedAtmPanel({
                             </div>
                             <div>
                                 <h4 className="text-sm font-bold text-white">
-                                    Withdraw from ATM
+                                    {mode === 'deposit'
+                                        ? 'Deposit cash at ATM'
+                                        : 'Withdraw from ATM'}
                                 </h4>
                                 <p className="text-[10px] text-slate-500">
-                                    Select account and enter amount
+                                    {mode === 'deposit'
+                                        ? 'Select account receiving the cash'
+                                        : 'Select account and enter amount'}
                                 </p>
                             </div>
                         </div>
@@ -876,7 +920,7 @@ function SelectedAtmPanel({
                             <select
                                 id="bank_account_id"
                                 disabled={
-                                    !available || bankAccounts.length === 0
+                                    !activeAvailable || bankAccounts.length === 0
                                 }
                                 value={form.data.bank_account_id}
                                 onChange={(e) =>
@@ -940,7 +984,7 @@ function SelectedAtmPanel({
                                     min="0.01"
                                     step="0.01"
                                     placeholder="0"
-                                    disabled={!available}
+                                    disabled={!activeAvailable}
                                     value={form.data.amount}
                                     onChange={(e) =>
                                         form.setData('amount', e.target.value)
@@ -969,7 +1013,7 @@ function SelectedAtmPanel({
                             )}
                         </div>
 
-                        {!available && (
+                        {!activeAvailable && (
                             <p
                                 className="rounded-lg px-3 py-2 text-xs text-red-300"
                                 style={{
@@ -977,7 +1021,22 @@ function SelectedAtmPanel({
                                     border: '1px solid #ef444433',
                                 }}
                             >
-                                This ATM is not available for withdrawal.
+                                {mode === 'deposit'
+                                    ? 'This ATM is not available for deposits.'
+                                    : 'This ATM is not available for withdrawal.'}
+                            </p>
+                        )}
+
+                        {mode === 'deposit' && activeAvailable && (
+                            <p
+                                className="rounded-lg px-3 py-2 text-xs text-slate-300"
+                                style={{
+                                    background: `${CIM.secondary}18`,
+                                    border: `1px solid ${CIM.secondary}33`,
+                                }}
+                            >
+                                Single deposit limit: 20,000 MAD. Your account
+                                balance updates immediately after confirmation.
                             </p>
                         )}
 
@@ -985,7 +1044,7 @@ function SelectedAtmPanel({
                             type="submit"
                             disabled={
                                 form.processing ||
-                                !available ||
+                                !activeAvailable ||
                                 !form.data.amount ||
                                 bankAccounts.length === 0
                             }
@@ -994,7 +1053,9 @@ function SelectedAtmPanel({
                         >
                             {form.processing
                                 ? 'Processing…'
-                                : 'Withdraw from ATM'}
+                                : mode === 'deposit'
+                                  ? 'Confirm deposit'
+                                  : 'Withdraw from ATM'}
                             <ChevronRight className="size-4" />
                         </button>
                     </form>

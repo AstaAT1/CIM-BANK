@@ -1,5 +1,6 @@
 import AppLogo from '@/components/app-logo';
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import ThemeToggle from '@/components/theme-toggle';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
 import { ShieldCheck } from 'lucide-react';
@@ -30,9 +31,11 @@ export function AppSidebarHeader({
             </div>
 
             <div className="hidden items-center gap-2 sm:flex">
+                <ThemeToggle className="h-10 w-10 rounded-2xl" />
+
                 <div className="inline-flex h-10 items-center gap-2 rounded-2xl border border-[#0A6474]/20 bg-[#0A6474]/10 px-3 text-xs font-semibold text-[#0A6474] dark:border-cyan-200/10 dark:bg-cyan-200/10 dark:text-cyan-100">
                     <ShieldCheck className="h-4 w-4" />
-                    Secure dashboard
+                    Secure home
                 </div>
 
                 <div className="inline-flex h-10 items-center rounded-2xl border border-[#D4A23C]/25 bg-[#D4A23C]/10 px-3 dark:border-[#D4A23C]/20">

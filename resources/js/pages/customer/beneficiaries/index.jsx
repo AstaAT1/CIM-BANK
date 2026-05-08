@@ -283,19 +283,6 @@ export default function Beneficiaries({ beneficiaries = [], filters = {} }) {
                         </div>
                     </section>
 
-                    {flash.success ? (
-                        <motion.div
-                            initial={{ opacity: 0, y: -8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="beneficiary-reveal rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 shadow-sm dark:border-emerald-400/20 dark:bg-emerald-400/10 dark:text-emerald-300"
-                        >
-                            <div className="flex items-center gap-2">
-                                <CheckCircle2 className="h-4 w-4" />
-                                {flash.success}
-                            </div>
-                        </motion.div>
-                    ) : null}
-
                     <section className="grid gap-6 xl:grid-cols-[0.88fr_1.12fr]">
                         <motion.form
                             onSubmit={addBeneficiary}

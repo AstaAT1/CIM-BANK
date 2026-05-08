@@ -1,11 +1,11 @@
 "use client";
 
 import { Link } from "@inertiajs/react";
-import { Menu, Moon, Sun, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import gsap from "gsap";
-import { useAppearance } from "@/hooks/use-appearance";
+import ThemeToggle from "@/components/theme-toggle";
 
 const navItems = [
     { label: "About", href: "#about" },
@@ -15,7 +15,6 @@ const navItems = [
 ];
 
 export default function Navbar() {
-    const { appearance, updateAppearance } = useAppearance();
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
 
@@ -75,14 +74,7 @@ export default function Navbar() {
                 </div>
 
                 <div className="cim-nav-reveal hidden items-center gap-3 md:flex">
-                    <button
-                        type="button"
-                        onClick={() => updateAppearance(appearance === "dark" ? "light" : "dark")}
-                        className="flex h-11 w-11 items-center justify-center rounded-full border border-[#D1D9DA]/80 bg-white/70 text-[#082F54] transition hover:-translate-y-0.5 hover:border-[#D4A23C] dark:border-white/10 dark:bg-white/10 dark:text-white"
-                        title="Toggle theme"
-                    >
-                        {appearance === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-                    </button>
+                    <ThemeToggle className="rounded-full" />
 
                     <Link href="/login" className="rounded-full px-4 py-2 text-sm font-semibold text-[#082F54] transition hover:text-[#D4A23C] dark:text-white">
                         Login
@@ -130,6 +122,7 @@ export default function Navbar() {
                                 Create
                             </Link>
                         </div>
+                        <ThemeToggle className="mt-2 w-full rounded-2xl" />
                     </div>
                 </motion.div>
             )}

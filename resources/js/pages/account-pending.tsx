@@ -18,6 +18,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import type { ComponentType, ReactNode } from 'react';
 import { motion } from 'motion/react';
 import gsap from 'gsap';
+import ThemeToggle from '@/components/theme-toggle';
 import background from './customer/images/CIM.png';
 
 type Props = {
@@ -145,17 +146,21 @@ export default function AccountPending({
 
             <main
                 ref={pageRef}
-                className="relative min-h-svh overflow-x-hidden bg-[#061F39] text-white"
+                className="relative min-h-svh overflow-x-hidden bg-[#F7F8FA] text-[#061F39] dark:bg-[#061F39] dark:text-white"
             >
+                <div className="fixed top-5 right-5 z-50">
+                    <ThemeToggle />
+                </div>
+
                 <div className="fixed inset-0">
                     <img
                         src={background}
                         alt="CIM Bank"
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-cover opacity-[0.08] dark:opacity-100"
                     />
-                    <div className="absolute inset-0 bg-[#061F39]/64" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#061F39]/94 via-[#061F39]/70 to-[#061F39]/36" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#061F39]/84 via-transparent to-[#061F39]/24" />
+                    <div className="absolute inset-0 bg-[#F7F8FA]/84 dark:bg-[#061F39]/64" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#F7F8FA]/96 via-white/84 to-[#F7F8FA]/70 dark:from-[#061F39]/94 dark:via-[#061F39]/70 dark:to-[#061F39]/36" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#F7F8FA]/86 via-transparent to-white/38 dark:from-[#061F39]/84 dark:via-transparent dark:to-[#061F39]/24" />
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(212,162,60,0.25),transparent_28%),radial-gradient(circle_at_88%_18%,rgba(10,100,116,0.22),transparent_34%)]" />
                 </div>
 
@@ -186,11 +191,11 @@ export default function AccountPending({
                                 {copy.badge}
                             </div>
 
-                            <h1 className="mt-4 max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
+                            <h1 className="mt-4 max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-[#061F39] dark:text-white sm:text-4xl lg:text-5xl">
                                 {copy.title}
                             </h1>
 
-                            <p className="mt-3 max-w-2xl text-sm leading-7 text-white/68">
+                            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 dark:text-white/68">
                                 {copy.subtitle}
                             </p>
                         </div>
@@ -203,11 +208,11 @@ export default function AccountPending({
 
                     <section className="grid flex-1 items-center gap-5 lg:grid-cols-[minmax(0,1fr)_390px]">
                         <motion.div
-                            className="pending-reveal overflow-hidden rounded-[1.75rem] border border-white/14 bg-white/[0.13] shadow-[0_30px_100px_rgba(0,0,0,0.32)] backdrop-blur-2xl"
+                            className="pending-reveal overflow-hidden rounded-[1.75rem] border border-[#D1D9DA]/80 bg-white/86 text-[#061F39] shadow-[0_30px_90px_rgba(6,31,57,0.12)] backdrop-blur-2xl dark:border-white/14 dark:bg-white/[0.13] dark:text-white dark:shadow-[0_30px_100px_rgba(0,0,0,0.32)]"
                             whileHover={{ y: -2 }}
                             transition={{ duration: 0.22 }}
                         >
-                            <div className="relative overflow-hidden border-b border-white/10 px-5 py-8 text-center sm:px-8">
+                            <div className="relative overflow-hidden border-b border-[#D1D9DA]/70 px-5 py-8 text-center dark:border-white/10 sm:px-8">
                                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(212,162,60,0.18),transparent_35%)]" />
 
                                 <div
@@ -224,13 +229,13 @@ export default function AccountPending({
                                     )}
                                 </div>
 
-                                <h2 className="relative mt-5 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+                                <h2 className="relative mt-5 text-2xl font-semibold tracking-tight text-[#061F39] dark:text-white sm:text-3xl">
                                     {isRejected
                                         ? 'Verification needs attention'
                                         : 'Verification is in progress'}
                                 </h2>
 
-                                <p className="relative mx-auto mt-3 max-w-xl text-sm leading-7 text-white/62">
+                                <p className="relative mx-auto mt-3 max-w-xl text-sm leading-7 text-slate-500 dark:text-white/62">
                                     {isRejected
                                         ? 'Your banking dashboard is temporarily locked until the issue is resolved with CIM staff.'
                                         : 'Your banking dashboard will unlock automatically once a bank employee verifies your request.'}
@@ -240,7 +245,7 @@ export default function AccountPending({
                             </div>
 
                             <div className="grid gap-5 p-5 lg:grid-cols-[0.9fr_1.1fr]">
-                                <div className="rounded-[1.4rem] border border-white/12 bg-white/[0.08] p-5">
+                                <div className="rounded-[1.4rem] border border-[#D1D9DA]/80 bg-[#F7F8FA]/80 p-5 dark:border-white/12 dark:bg-white/[0.08]">
                                     <div className="flex items-center gap-3">
                                         <span
                                             className={`flex h-12 w-12 items-center justify-center rounded-2xl ${
@@ -257,10 +262,10 @@ export default function AccountPending({
                                         </span>
 
                                         <div>
-                                            <p className="text-xs font-bold tracking-[0.14em] text-white/42 uppercase">
+                                            <p className="text-xs font-bold tracking-[0.14em] text-slate-400 uppercase dark:text-white/42">
                                                 Current access
                                             </p>
-                                            <p className="mt-1 text-xl font-semibold text-white">
+                                            <p className="mt-1 text-xl font-semibold text-[#061F39] dark:text-white">
                                                 {isRejected
                                                     ? 'Dashboard locked'
                                                     : 'Awaiting approval'}
@@ -268,7 +273,7 @@ export default function AccountPending({
                                         </div>
                                     </div>
 
-                                    <p className="mt-4 text-sm leading-7 text-white/56">
+                                    <p className="mt-4 text-sm leading-7 text-slate-500 dark:text-white/56">
                                         {isRejected
                                             ? 'Contact CIM or visit your selected branch to understand why the verification failed and what must be corrected.'
                                             : 'You can check this page later. After approval, your account, card, and banking services will become available.'}
@@ -304,20 +309,20 @@ export default function AccountPending({
 
                         <aside className="space-y-5">
                             <motion.div
-                                className="pending-reveal overflow-hidden rounded-[1.75rem] border border-white/14 bg-white/[0.13] shadow-[0_30px_100px_rgba(0,0,0,0.28)] backdrop-blur-2xl"
+                                className="pending-reveal overflow-hidden rounded-[1.75rem] border border-[#D1D9DA]/80 bg-white/86 text-[#061F39] shadow-[0_30px_90px_rgba(6,31,57,0.1)] backdrop-blur-2xl dark:border-white/14 dark:bg-white/[0.13] dark:text-white dark:shadow-[0_30px_100px_rgba(0,0,0,0.28)]"
                                 whileHover={{ y: -2 }}
                                 transition={{ duration: 0.22 }}
                             >
-                                <div className="border-b border-white/10 px-5 py-4">
+                                <div className="border-b border-[#D1D9DA]/70 px-5 py-4 dark:border-white/10">
                                     <div className="flex items-center gap-3">
-                                        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0A6474]/20 text-cyan-100">
+                                        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0A6474]/10 text-[#0A6474] dark:bg-[#0A6474]/20 dark:text-cyan-100">
                                             <UserRound className="h-5 w-5" />
                                         </span>
                                         <div>
-                                            <h3 className="font-semibold text-white">
+                                            <h3 className="font-semibold text-[#061F39] dark:text-white">
                                                 What you can do now
                                             </h3>
-                                            <p className="text-xs text-white/48">
+                                            <p className="text-xs text-slate-500 dark:text-white/48">
                                                 Recommended actions
                                             </p>
                                         </div>
@@ -360,17 +365,17 @@ export default function AccountPending({
                             </motion.div>
 
                             <motion.div
-                                className="pending-reveal rounded-[1.75rem] border border-white/14 bg-white/[0.13] p-5 shadow-[0_30px_100px_rgba(0,0,0,0.24)] backdrop-blur-2xl"
+                                className="pending-reveal rounded-[1.75rem] border border-[#D1D9DA]/80 bg-white/86 p-5 text-[#061F39] shadow-[0_30px_90px_rgba(6,31,57,0.1)] backdrop-blur-2xl dark:border-white/14 dark:bg-white/[0.13] dark:text-white dark:shadow-[0_30px_100px_rgba(0,0,0,0.24)]"
                                 whileHover={{ y: -2 }}
                                 transition={{ duration: 0.22 }}
                             >
                                 <div className="flex gap-3">
                                     <Landmark className="mt-0.5 h-5 w-5 shrink-0 text-[#F6D27B]" />
                                     <div>
-                                        <h3 className="font-semibold text-white">
+                                        <h3 className="font-semibold text-[#061F39] dark:text-white">
                                             CIM secure onboarding
                                         </h3>
-                                        <p className="mt-2 text-sm leading-6 text-white/58">
+                                        <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-white/58">
                                             Account access is protected until a
                                             bank employee confirms your identity
                                             and activates the request.
@@ -392,7 +397,7 @@ export default function AccountPending({
                                     href="/logout"
                                     method="post"
                                     as="button"
-                                    className="inline-flex h-13 w-full items-center justify-center gap-2 rounded-2xl border border-white/12 bg-white/[0.08] px-5 text-sm font-bold text-white/76 transition hover:border-rose-300/35 hover:bg-rose-400/12 hover:text-rose-100"
+                                    className="inline-flex h-13 w-full items-center justify-center gap-2 rounded-2xl border border-[#D1D9DA]/80 bg-white px-5 text-sm font-bold text-[#082F54] transition hover:border-rose-300/45 hover:bg-rose-500/10 hover:text-rose-700 dark:border-white/12 dark:bg-white/[0.08] dark:text-white/76 dark:hover:border-rose-300/35 dark:hover:bg-rose-400/12 dark:hover:text-rose-100"
                                 >
                                     Log out
                                 </Link>
@@ -413,16 +418,18 @@ function StatusOverview({
     statusItems: { label: string; value: string }[];
 }) {
     return (
-        <div className="pending-reveal w-full rounded-[1.5rem] border border-white/12 bg-white/[0.1] p-4 backdrop-blur-2xl lg:max-w-[420px]">
+        <div className="pending-reveal w-full rounded-[1.5rem] border border-[#D1D9DA]/80 bg-white/80 p-4 backdrop-blur-2xl dark:border-white/12 dark:bg-white/[0.1] lg:max-w-[420px]">
             <div className="mb-3 flex items-center gap-2">
                 {isRejected ? (
-                    <AlertTriangle className="h-4 w-4 text-rose-100" />
+                    <AlertTriangle className="h-4 w-4 text-rose-600 dark:text-rose-100" />
                 ) : (
                     <Landmark className="h-4 w-4 text-[#F6D27B]" />
                 )}
                 <p
                     className={`text-xs font-bold tracking-[0.16em] uppercase ${
-                        isRejected ? 'text-rose-100' : 'text-[#F6D27B]'
+                        isRejected
+                            ? 'text-rose-600 dark:text-rose-100'
+                            : 'text-[#D4A23C] dark:text-[#F6D27B]'
                     }`}
                 >
                     Account state
@@ -456,22 +463,22 @@ function ProcessStep({
     isRejected: boolean;
 }) {
     return (
-        <div className="rounded-2xl border border-white/12 bg-white/[0.08] p-4">
+        <div className="rounded-2xl border border-[#D1D9DA]/80 bg-[#F7F8FA]/80 p-4 dark:border-white/12 dark:bg-white/[0.08]">
             <div className="flex gap-3">
                 <span
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
                         isRejected
-                            ? 'bg-white/10 text-white/54'
+                            ? 'bg-slate-100 text-slate-400 dark:bg-white/10 dark:text-white/54'
                             : index === 4
                               ? 'bg-[#D4A23C] text-[#061F39]'
-                              : 'bg-cyan-200/10 text-cyan-100'
+                              : 'bg-cyan-500/10 text-[#0A6474] dark:bg-cyan-200/10 dark:text-cyan-100'
                     }`}
                 >
                     <Icon className="h-4 w-4" />
                 </span>
                 <div>
-                    <p className="text-sm font-semibold text-white">{title}</p>
-                    <p className="mt-1 text-xs leading-5 text-white/50">
+                    <p className="text-sm font-semibold text-[#061F39] dark:text-white">{title}</p>
+                    <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-white/50">
                         {text}
                     </p>
                 </div>
@@ -482,12 +489,12 @@ function ProcessStep({
 
 function AdviceCard({ title, text }: { title: string; text: string }) {
     return (
-        <div className="rounded-2xl border border-white/12 bg-white/[0.08] p-4">
+        <div className="rounded-2xl border border-[#D1D9DA]/80 bg-[#F7F8FA]/80 p-4 dark:border-white/12 dark:bg-white/[0.08]">
             <div className="flex gap-3">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#F6D27B]" />
                 <div>
-                    <p className="text-sm font-semibold text-white">{title}</p>
-                    <p className="mt-1 text-xs leading-5 text-white/50">
+                    <p className="text-sm font-semibold text-[#061F39] dark:text-white">{title}</p>
+                    <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-white/50">
                         {text}
                     </p>
                 </div>
@@ -505,12 +512,12 @@ function StatusPill({ label, value }: { label: string; value: string }) {
     const scheduled = normalized === 'appointment_scheduled';
 
     const className = rejected
-        ? 'border-rose-300/25 bg-rose-400/10 text-rose-100'
+        ? 'border-rose-300/35 bg-rose-500/10 text-rose-700 dark:border-rose-300/25 dark:bg-rose-400/10 dark:text-rose-100'
         : approved
-          ? 'border-emerald-300/25 bg-emerald-400/10 text-emerald-100'
+          ? 'border-emerald-300/35 bg-emerald-500/10 text-emerald-700 dark:border-emerald-300/25 dark:bg-emerald-400/10 dark:text-emerald-100'
           : scheduled
-            ? 'border-cyan-200/20 bg-cyan-200/10 text-cyan-100'
-            : 'border-[#D4A23C]/35 bg-[#D4A23C]/12 text-[#F6D27B]';
+            ? 'border-cyan-500/20 bg-cyan-500/10 text-[#0A6474] dark:border-cyan-200/20 dark:bg-cyan-200/10 dark:text-cyan-100'
+            : 'border-[#D4A23C]/35 bg-[#D4A23C]/12 text-[#8A6418] dark:text-[#F6D27B]';
 
     return (
         <div

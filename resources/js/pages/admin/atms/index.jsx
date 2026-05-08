@@ -1,13 +1,13 @@
 import 'leaflet/dist/leaflet.css';
 
 import { Head, router, useForm } from '@inertiajs/react';
+import CimFeedbackModal from '@/components/cim-feedback-modal';
 import L from 'leaflet';
 import {
     Activity,
     ArrowRight,
     Banknote,
     Building2,
-    CheckCircle2,
     ChevronRight,
     CircleAlert,
     LocateFixed,
@@ -30,6 +30,7 @@ import {
     Tooltip,
     useMap,
 } from 'react-leaflet';
+import { toast } from 'sonner';
 
 import adminAtms from '@/routes/admin/atms';
 
@@ -685,13 +686,31 @@ function MapTopBar({ counts }) {
 function AdminToolsPanel({ atm, isAdmin, onOpenFull }) {
     const updateForm = useForm(atmFormPayload(atm));
     const loadForm = useForm({ amount: '', note: '' });
+    const [formFeedback, setFormFeedback] = useState('');
 
     useEffect(() => {
         updateForm.setData(atmFormPayload(atm));
         updateForm.clearErrors();
         loadForm.reset('amount', 'note');
         loadForm.clearErrors();
+        setFormFeedback('');
     }, [atm?.id]);
+
+    useEffect(() => {
+        const message = Object.values(updateForm.errors)[0];
+
+        if (message) {
+            setFormFeedback(String(message));
+        }
+    }, [updateForm.errors]);
+
+    useEffect(() => {
+        const message = Object.values(loadForm.errors)[0];
+
+        if (message) {
+            setFormFeedback(String(message));
+        }
+    }, [loadForm.errors]);
 
     if (!atm) {
         return (
@@ -738,7 +757,10 @@ function AdminToolsPanel({ atm, isAdmin, onOpenFull }) {
         e.preventDefault();
         loadForm.post(`/backend/admin/atms/${atm.id}/load-cash`, {
             preserveScroll: true,
-            onSuccess: () => loadForm.reset('amount', 'note'),
+            onSuccess: () => {
+                loadForm.reset('amount', 'note');
+                toast.success('Cash loaded successfully.');
+            },
         });
     };
 
@@ -750,6 +772,14 @@ function AdminToolsPanel({ atm, isAdmin, onOpenFull }) {
                 backdropFilter: 'blur(16px)',
             }}
         >
+            <CimFeedbackModal
+                open={Boolean(formFeedback)}
+                type="error"
+                title="ATM update failed"
+                message={formFeedback}
+                confirmLabel="Close"
+                onClose={() => setFormFeedback('')}
+            />
             {/* ATM header */}
             <div
                 className="border-b border-white/8 p-5"
@@ -1042,18 +1072,6 @@ function AdminToolsPanel({ atm, isAdmin, onOpenFull }) {
                             </div>
                         </fieldset>
 
-                        {Object.values(updateForm.errors).length > 0 && (
-                            <div
-                                className="mt-4 rounded-xl px-3 py-2 text-xs text-red-300"
-                                style={{
-                                    background: '#ef444418',
-                                    border: '1px solid #ef444433',
-                                }}
-                            >
-                                {Object.values(updateForm.errors)[0]}
-                            </div>
-                        )}
-
                         <div className="mt-4 flex items-center justify-between gap-3">
                             <p className="text-[10px] text-slate-600">
                                 Current cash is adjusted via movements.
@@ -1170,32 +1188,6 @@ function AdminToolsPanel({ atm, isAdmin, onOpenFull }) {
                                 />
                             </label>
                         </fieldset>
-
-                        {Object.values(loadForm.errors).length > 0 && (
-                            <div
-                                className="mt-3 rounded-xl px-3 py-2 text-xs text-red-300"
-                                style={{
-                                    background: '#ef444418',
-                                    border: '1px solid #ef444433',
-                                }}
-                            >
-                                {Object.values(loadForm.errors)[0]}
-                            </div>
-                        )}
-
-                        {loadForm.wasSuccessful && (
-                            <div
-                                className="mt-3 flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold"
-                                style={{
-                                    background: '#22c55e18',
-                                    border: '1px solid #22c55e33',
-                                    color: '#22c55e',
-                                }}
-                            >
-                                <CheckCircle2 className="size-4" /> Cash loaded
-                                successfully.
-                            </div>
-                        )}
 
                         <button
                             type="submit"

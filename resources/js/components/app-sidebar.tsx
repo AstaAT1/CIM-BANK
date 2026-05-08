@@ -134,7 +134,7 @@ export function AppSidebar() {
         <Sidebar
             collapsible="icon"
             variant="sidebar"
-            className="border-r border-[#0A6474]/15 bg-[#061F39]"
+            className="border-r border-[#D1D9DA] bg-white dark:border-[#0A6474]/15 dark:bg-[#061F39]"
         >
             <SidebarHeader className="px-4 pt-5 pb-4 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:pt-4 group-data-[collapsible=icon]:pb-3">
                 <SidebarMenu>
@@ -143,7 +143,7 @@ export function AppSidebar() {
                             size="lg"
                             asChild
                             tooltip="CIM Bank"
-                            className="h-14 rounded-2xl border-0 bg-transparent px-0 text-white shadow-none hover:bg-white/[0.06] data-[active=true]:bg-transparent group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:h-11! group-data-[collapsible=icon]:w-11! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:rounded-2xl group-data-[collapsible=icon]:p-0!"
+                            className="h-14 rounded-2xl border-0 bg-transparent px-0 text-[#061F39] shadow-none hover:bg-[#082F54]/7 data-[active=true]:bg-transparent dark:text-white dark:hover:bg-white/[0.06] group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:h-11! group-data-[collapsible=icon]:w-11! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:rounded-2xl group-data-[collapsible=icon]:p-0!"
                         >
                             <Link
                                 href={homeHref}
@@ -166,7 +166,7 @@ export function AppSidebar() {
 
             <SidebarContent className="px-3 pt-1 pb-3 !overflow-visible group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:gap-2 group-data-[collapsible=icon]:overflow-hidden! group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:pt-1">
                 <div className="mb-3 px-2 group-data-[collapsible=icon]:hidden">
-                    <p className="text-[11px] font-bold tracking-[0.18em] text-white/35 uppercase">
+                    <p className="text-[11px] font-bold tracking-[0.18em] text-slate-400 uppercase dark:text-white/35">
                         {navLabel}
                     </p>
                 </div>
@@ -174,7 +174,7 @@ export function AppSidebar() {
                 <NavMain items={navItems} label={navLabel} />
             </SidebarContent>
 
-            <SidebarFooter className="mt-auto border-t border-white/10 px-4 pt-3 pb-4 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:pt-3 group-data-[collapsible=icon]:pb-4">
+            <SidebarFooter className="mt-auto border-t border-[#D1D9DA]/80 px-4 pt-3 pb-4 dark:border-white/10 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:pt-3 group-data-[collapsible=icon]:pb-4">
                 <NavUser />
             </SidebarFooter>
 

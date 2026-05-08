@@ -1,4 +1,5 @@
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import CimFeedbackModal from '@/components/cim-feedback-modal';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { gsap } from 'gsap';
@@ -292,6 +293,7 @@ export default function BillsCenter({
     const flash = props.flash || {};
     const [editingBill, setEditingBill] = useState(null);
     const [historyBill, setHistoryBill] = useState(null);
+    const [billError, setBillError] = useState('');
 
     const defaultAccountId = accounts[0]?.id ? String(accounts[0].id) : '';
     const form = useForm({
@@ -340,6 +342,12 @@ export default function BillsCenter({
             Number(account?.balance ?? 0)
         );
     });
+
+    useEffect(() => {
+        if (props.errors?.bill) {
+            setBillError(props.errors.bill);
+        }
+    }, [props.errors?.bill]);
 
     const resetForm = () => {
         setEditingBill(null);
@@ -480,6 +488,14 @@ export default function BillsCenter({
     return (
         <>
             <Head title="Bills & AutoPay" />
+            <CimFeedbackModal
+                open={Boolean(billError)}
+                type="error"
+                title="Payment could not be completed"
+                message={billError}
+                confirmLabel="Close"
+                onClose={() => setBillError('')}
+            />
 
             <main
                 ref={pageRef}
@@ -579,25 +595,6 @@ export default function BillsCenter({
                             </div>
                         </div>
                     </section>
-
-                    {flash.success ? (
-                        <motion.div
-                            className="bills-reveal rounded-2xl border border-emerald-300/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-700 dark:text-emerald-200"
-                            initial={{ scale: 0.98 }}
-                            animate={{ scale: 1 }}
-                        >
-                            {flash.success}
-                        </motion.div>
-                    ) : null}
-                    {props.errors?.bill ? (
-                        <motion.div
-                            className="bills-reveal rounded-2xl border border-rose-300/30 bg-rose-500/10 px-4 py-3 text-sm font-semibold text-rose-700 dark:text-rose-200"
-                            initial={{ scale: 0.98 }}
-                            animate={{ scale: 1 }}
-                        >
-                            {props.errors.bill}
-                        </motion.div>
-                    ) : null}
 
                     <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
                         <MetricCard

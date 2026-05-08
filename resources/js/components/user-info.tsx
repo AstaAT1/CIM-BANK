@@ -26,11 +26,11 @@ export function UserInfo({
                 data-slot="user-meta"
                 className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden"
             >
-                <span className="truncate font-semibold text-white">
+                <span className="truncate font-semibold text-[#061F39] dark:text-white">
                     {user.name}
                 </span>
                 {showEmail && (
-                    <span className="truncate text-xs text-white/50">
+                    <span className="truncate text-xs text-slate-500 dark:text-white/50">
                         {user.email}
                     </span>
                 )}

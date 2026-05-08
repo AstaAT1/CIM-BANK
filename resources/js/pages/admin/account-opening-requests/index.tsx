@@ -337,26 +337,6 @@ export default function AccountOpeningRequestsIndex() {
                         </div>
                     </section>
 
-                    {flash?.success && (
-                        <motion.div
-                            className="aor-reveal rounded-2xl border border-emerald-300/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-700 dark:text-emerald-200"
-                            initial={{ scale: 0.98 }}
-                            animate={{ scale: 1 }}
-                        >
-                            {flash.success}
-                        </motion.div>
-                    )}
-
-                    {flash?.error && (
-                        <motion.div
-                            className="aor-reveal rounded-2xl border border-rose-300/30 bg-rose-500/10 px-4 py-3 text-sm font-semibold text-rose-700 dark:text-rose-200"
-                            initial={{ scale: 0.98 }}
-                            animate={{ scale: 1 }}
-                        >
-                            {flash.error}
-                        </motion.div>
-                    )}
-
                     <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
                         <StatCard
                             icon={ClipboardCheck}

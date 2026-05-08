@@ -1,4 +1,5 @@
 import type { DateSelectArg, EventInput } from '@fullcalendar/core';
+import CimFeedbackModal from '@/components/cim-feedback-modal';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import FullCalendar from '@fullcalendar/react';
@@ -26,6 +27,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ComponentType, ReactNode } from 'react';
 import { motion } from 'motion/react';
 import gsap from 'gsap';
+import ThemeToggle from '@/components/theme-toggle';
 import background from '../customer/images/CIM.png';
 
 const CIM = {
@@ -244,20 +246,32 @@ export default function AppointmentBooking({
     return (
         <>
             <Head title="Book an Appointment — CIM" />
+            <CimFeedbackModal
+                open={Boolean(error)}
+                type="warning"
+                title="Appointment needs attention"
+                message={error}
+                confirmLabel="Close"
+                onClose={() => setError('')}
+            />
 
             <main
                 ref={pageRef}
-                className="relative min-h-svh overflow-x-hidden bg-[#061F39] text-white"
+                className="relative min-h-svh overflow-x-hidden bg-[#F7F8FA] text-[#061F39] dark:bg-[#061F39] dark:text-white"
             >
+                <div className="fixed top-5 right-5 z-50">
+                    <ThemeToggle />
+                </div>
+
                 <div className="fixed inset-0">
                     <img
                         src={background}
                         alt="CIM Bank"
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-cover opacity-[0.08] dark:opacity-100"
                     />
-                    <div className="absolute inset-0 bg-[#061F39]/60" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#061F39]/94 via-[#061F39]/68 to-[#061F39]/34" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#061F39]/82 via-transparent to-[#061F39]/20" />
+                    <div className="absolute inset-0 bg-[#F7F8FA]/84 dark:bg-[#061F39]/60" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#F7F8FA]/96 via-white/84 to-[#F7F8FA]/70 dark:from-[#061F39]/94 dark:via-[#061F39]/68 dark:to-[#061F39]/34" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#F7F8FA]/86 via-transparent to-white/38 dark:from-[#061F39]/82 dark:via-transparent dark:to-[#061F39]/20" />
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(212,162,60,0.25),transparent_28%),radial-gradient(circle_at_88%_18%,rgba(10,100,116,0.22),transparent_34%)]" />
                 </div>
 
@@ -278,11 +292,11 @@ export default function AppointmentBooking({
                                 Final onboarding step
                             </div>
 
-                            <h1 className="mt-4 max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
+                            <h1 className="mt-4 max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-[#061F39] dark:text-white sm:text-4xl lg:text-5xl">
                                 Choose your branch appointment.
                             </h1>
 
-                            <p className="mt-3 max-w-2xl text-sm leading-7 text-white/68">
+                            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 dark:text-white/68">
                                 Select a future weekday slot for your in-branch
                                 verification. Booked slots are blocked, and your
                                 appointment will be attached to request{' '}
@@ -298,20 +312,20 @@ export default function AppointmentBooking({
 
                     <section className="grid flex-1 gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
                         <motion.div
-                            className="appointment-reveal overflow-hidden rounded-[1.75rem] border border-white/14 bg-white/[0.13] shadow-[0_30px_100px_rgba(0,0,0,0.32)] backdrop-blur-2xl"
+                            className="appointment-reveal overflow-hidden rounded-[1.75rem] border border-[#D1D9DA]/80 bg-white/86 text-[#061F39] shadow-[0_30px_90px_rgba(6,31,57,0.12)] backdrop-blur-2xl dark:border-white/14 dark:bg-white/[0.13] dark:text-white dark:shadow-[0_30px_100px_rgba(0,0,0,0.32)]"
                             whileHover={{ y: -2 }}
                             transition={{ duration: 0.22 }}
                         >
-                            <div className="flex flex-col gap-4 border-b border-white/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex flex-col gap-4 border-b border-[#D1D9DA]/70 px-5 py-4 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
-                                    <div className="inline-flex items-center gap-2 rounded-full border border-[#0A6474]/30 bg-[#0A6474]/18 px-3 py-1 text-xs font-semibold text-cyan-100">
+                                    <div className="inline-flex items-center gap-2 rounded-full border border-[#0A6474]/30 bg-[#0A6474]/10 px-3 py-1 text-xs font-semibold text-[#0A6474] dark:bg-[#0A6474]/18 dark:text-cyan-100">
                                         <MousePointerClick className="h-3.5 w-3.5" />
                                         Click or drag a slot
                                     </div>
-                                    <h2 className="mt-3 text-xl font-semibold text-white">
+                                    <h2 className="mt-3 text-xl font-semibold text-[#061F39] dark:text-white">
                                         Appointment calendar
                                     </h2>
-                                    <p className="mt-1 text-sm text-white/55">
+                                    <p className="mt-1 text-sm text-slate-500 dark:text-white/55">
                                         Available hours: Monday to Friday, 08:30
                                         — 16:30.
                                     </p>
@@ -321,14 +335,14 @@ export default function AppointmentBooking({
                                     <span className="rounded-full border border-[#D4A23C]/35 bg-[#D4A23C]/12 px-3 py-1 text-[#F6D27B]">
                                         Gold = selected
                                     </span>
-                                    <span className="rounded-full border border-rose-300/20 bg-rose-400/10 px-3 py-1 text-rose-100">
+                                    <span className="rounded-full border border-rose-300/30 bg-rose-500/10 px-3 py-1 text-rose-700 dark:border-rose-300/20 dark:bg-rose-400/10 dark:text-rose-100">
                                         Red = booked
                                     </span>
                                 </div>
                             </div>
 
                             <div className="p-3 sm:p-5">
-                                <div className="cim-calendar overflow-hidden rounded-[1.4rem] border border-white/10 bg-white/[0.96] p-3 text-[#061F39] shadow-sm">
+                                <div className="cim-calendar overflow-hidden rounded-[1.4rem] border border-[#D1D9DA]/80 bg-white/[0.96] p-3 text-[#061F39] shadow-sm dark:border-white/10">
                                     <FullCalendar
                                         plugins={[
                                             dayGridPlugin,
@@ -368,20 +382,20 @@ export default function AppointmentBooking({
 
                         <aside className="space-y-5">
                             <motion.div
-                                className="appointment-reveal overflow-hidden rounded-[1.75rem] border border-white/14 bg-white/[0.13] shadow-[0_30px_100px_rgba(0,0,0,0.28)] backdrop-blur-2xl"
+                                className="appointment-reveal overflow-hidden rounded-[1.75rem] border border-[#D1D9DA]/80 bg-white/86 text-[#061F39] shadow-[0_30px_90px_rgba(6,31,57,0.1)] backdrop-blur-2xl dark:border-white/14 dark:bg-white/[0.13] dark:text-white dark:shadow-[0_30px_100px_rgba(0,0,0,0.28)]"
                                 whileHover={{ y: -2 }}
                                 transition={{ duration: 0.22 }}
                             >
-                                <div className="border-b border-white/10 px-5 py-4">
+                                <div className="border-b border-[#D1D9DA]/70 px-5 py-4 dark:border-white/10">
                                     <div className="flex items-center gap-3">
                                         <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#D4A23C]/14 text-[#F6D27B]">
                                             <UserRound className="h-5 w-5" />
                                         </span>
                                         <div>
-                                            <h3 className="font-semibold text-white">
+                                            <h3 className="font-semibold text-[#061F39] dark:text-white">
                                                 Request summary
                                             </h3>
-                                            <p className="text-xs text-white/48">
+                                            <p className="text-xs text-slate-500 dark:text-white/48">
                                                 Verification dossier
                                             </p>
                                         </div>
@@ -422,20 +436,20 @@ export default function AppointmentBooking({
                             </motion.div>
 
                             <motion.div
-                                className="appointment-reveal overflow-hidden rounded-[1.75rem] border border-white/14 bg-white/[0.13] shadow-[0_30px_100px_rgba(0,0,0,0.28)] backdrop-blur-2xl"
+                                className="appointment-reveal overflow-hidden rounded-[1.75rem] border border-[#D1D9DA]/80 bg-white/86 text-[#061F39] shadow-[0_30px_90px_rgba(6,31,57,0.1)] backdrop-blur-2xl dark:border-white/14 dark:bg-white/[0.13] dark:text-white dark:shadow-[0_30px_100px_rgba(0,0,0,0.28)]"
                                 whileHover={{ y: -2 }}
                                 transition={{ duration: 0.22 }}
                             >
-                                <div className="border-b border-white/10 px-5 py-4">
+                                <div className="border-b border-[#D1D9DA]/70 px-5 py-4 dark:border-white/10">
                                     <div className="flex items-center gap-3">
-                                        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0A6474]/20 text-cyan-100">
+                                        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0A6474]/10 text-[#0A6474] dark:bg-[#0A6474]/20 dark:text-cyan-100">
                                             <CalendarCheck className="h-5 w-5" />
                                         </span>
                                         <div>
-                                            <h3 className="font-semibold text-white">
+                                            <h3 className="font-semibold text-[#061F39] dark:text-white">
                                                 Confirm booking
                                             </h3>
-                                            <p className="text-xs text-white/48">
+                                            <p className="text-xs text-slate-500 dark:text-white/48">
                                                 30-minute verification slot
                                             </p>
                                         </div>
@@ -450,10 +464,10 @@ export default function AppointmentBooking({
                                                     <p className="text-xs font-bold tracking-[0.14em] text-[#F6D27B] uppercase">
                                                         Selected appointment
                                                     </p>
-                                                    <p className="mt-2 text-2xl font-semibold text-white">
+                                                    <p className="mt-2 text-2xl font-semibold text-[#061F39] dark:text-white">
                                                         {selectedShort.day}
                                                     </p>
-                                                    <p className="mt-1 flex items-center gap-2 text-sm font-semibold text-white/70">
+                                                    <p className="mt-1 flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-white/70">
                                                         <Clock3 className="h-4 w-4 text-[#F6D27B]" />
                                                         {selectedShort.time}
                                                     </p>
@@ -462,33 +476,27 @@ export default function AppointmentBooking({
                                                 <button
                                                     type="button"
                                                     onClick={clearSelection}
-                                                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/12 bg-white/[0.08] text-white/75 transition hover:border-rose-300/35 hover:bg-rose-400/12 hover:text-rose-100"
+                                                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#D1D9DA]/80 bg-white text-slate-500 transition hover:border-rose-300/45 hover:bg-rose-500/10 hover:text-rose-700 dark:border-white/12 dark:bg-white/[0.08] dark:text-white/75 dark:hover:border-rose-300/35 dark:hover:bg-rose-400/12 dark:hover:text-rose-100"
                                                     title="Clear selection"
                                                 >
                                                     <Eraser className="h-4 w-4" />
                                                 </button>
                                             </div>
 
-                                            <p className="mt-3 text-xs leading-5 text-white/55">
+                                            <p className="mt-3 text-xs leading-5 text-slate-500 dark:text-white/55">
                                                 {selectedDisplay}
                                             </p>
                                         </div>
                                     ) : (
-                                        <div className="rounded-[1.35rem] border border-dashed border-white/16 bg-white/[0.07] p-5 text-center">
+                                        <div className="rounded-[1.35rem] border border-dashed border-[#D1D9DA]/80 bg-[#F7F8FA]/80 p-5 text-center dark:border-white/16 dark:bg-white/[0.07]">
                                             <CalendarCheck className="mx-auto h-8 w-8 text-[#F6D27B]" />
-                                            <p className="mt-3 text-sm font-semibold text-white">
+                                            <p className="mt-3 text-sm font-semibold text-[#061F39] dark:text-white">
                                                 No slot selected
                                             </p>
-                                            <p className="mt-1 text-xs leading-5 text-white/52">
+                                            <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-white/52">
                                                 Pick any available future time
                                                 slot from the calendar.
                                             </p>
-                                        </div>
-                                    )}
-
-                                    {error && (
-                                        <div className="mt-3 rounded-2xl border border-rose-300/25 bg-rose-400/10 px-4 py-3 text-sm font-semibold text-rose-100">
-                                            {error}
                                         </div>
                                     )}
 
@@ -496,7 +504,7 @@ export default function AppointmentBooking({
                                         type="button"
                                         onClick={handleBook}
                                         disabled={!selectedSlot || processing}
-                                        className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#D4A23C] px-5 text-sm font-bold text-[#061F39] shadow-lg shadow-[#D4A23C]/20 transition hover:-translate-y-0.5 hover:bg-[#e2b34a] disabled:cursor-not-allowed disabled:bg-white/18 disabled:text-white/40 disabled:shadow-none"
+                                        className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#D4A23C] px-5 text-sm font-bold text-[#061F39] shadow-lg shadow-[#D4A23C]/20 transition hover:-translate-y-0.5 hover:bg-[#e2b34a] disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none dark:disabled:bg-white/18 dark:disabled:text-white/40"
                                     >
                                         {processing ? (
                                             <>
@@ -515,10 +523,10 @@ export default function AppointmentBooking({
                                 </div>
                             </motion.div>
 
-                            <div className="appointment-reveal rounded-[1.4rem] border border-white/12 bg-white/[0.08] p-4 backdrop-blur-xl">
+                            <div className="appointment-reveal rounded-[1.4rem] border border-[#D1D9DA]/80 bg-white/80 p-4 backdrop-blur-xl dark:border-white/12 dark:bg-white/[0.08]">
                                 <div className="flex gap-3">
                                     <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#F6D27B]" />
-                                    <p className="text-xs leading-6 text-white/58">
+                                    <p className="text-xs leading-6 text-slate-500 dark:text-white/58">
                                         Your appointment only confirms the
                                         verification visit. Account activation is
                                         completed after staff review.
@@ -631,7 +639,7 @@ export default function AppointmentBooking({
 
 function JourneyCard() {
     return (
-        <div className="appointment-reveal w-full rounded-[1.5rem] border border-white/12 bg-white/[0.1] p-4 backdrop-blur-2xl lg:max-w-[420px]">
+        <div className="appointment-reveal w-full rounded-[1.5rem] border border-[#D1D9DA]/80 bg-white/80 p-4 backdrop-blur-2xl dark:border-white/12 dark:bg-white/[0.1] lg:max-w-[420px]">
             <div className="mb-3 flex items-center gap-2">
                 <Landmark className="h-4 w-4 text-[#F6D27B]" />
                 <p className="text-xs font-bold tracking-[0.16em] text-[#F6D27B] uppercase">
@@ -663,7 +671,9 @@ function JourneyCard() {
                             </span>
                             <p
                                 className={`mt-2 text-[10px] font-bold ${
-                                    active ? 'text-[#F6D27B]' : 'text-emerald-100'
+                                    active
+                                        ? 'text-[#D4A23C] dark:text-[#F6D27B]'
+                                        : 'text-emerald-700 dark:text-emerald-100'
                                 }`}
                             >
                                 {step.label}
@@ -686,14 +696,14 @@ function SummaryRow({
     value: ReactNode;
 }) {
     return (
-        <div className="rounded-2xl border border-white/12 bg-white/[0.08] px-4 py-3">
+        <div className="rounded-2xl border border-[#D1D9DA]/80 bg-[#F7F8FA]/80 px-4 py-3 dark:border-white/12 dark:bg-white/[0.08]">
             <div className="flex items-start gap-3">
                 <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[#F6D27B]" />
                 <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold tracking-[0.12em] text-white/42 uppercase">
+                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-400 uppercase dark:text-white/42">
                         {label}
                     </p>
-                    <p className="mt-1 break-words text-sm font-semibold text-white/82">
+                    <p className="mt-1 break-words text-sm font-semibold text-[#061F39] dark:text-white/82">
                         {value}
                     </p>
                 </div>

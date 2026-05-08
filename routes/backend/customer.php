@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Customer\AtmMapController;
+use App\Http\Controllers\Customer\AtmDepositController;
 use App\Http\Controllers\Customer\AtmWithdrawalController;
 use App\Http\Controllers\Customer\BeneficiaryController;
 use App\Http\Controllers\Customer\BillController;
@@ -151,4 +152,8 @@ Route::middleware(['auth', 'verified', 'role.customer', 'verified.customer'])
         // ATM withdrawal
         Route::post('/atm-withdrawals', [AtmWithdrawalController::class, 'store'])
             ->name('atm-withdrawals.store');
+
+        // ATM cash deposit
+        Route::post('/atms/{atm}/deposit', [AtmDepositController::class, 'store'])
+            ->name('atms.deposit');
     });

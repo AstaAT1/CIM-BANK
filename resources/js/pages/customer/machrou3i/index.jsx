@@ -1,7 +1,8 @@
-import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { gsap } from 'gsap';
+import { toast } from 'sonner';
 import {
     BadgeCheck,
     Banknote,
@@ -195,10 +196,7 @@ export default function CustomerMachrou3i({
     customer = {},
 }) {
     const pageRef = useRef(null);
-    const { props } = usePage();
-    const flash = props.flash || {};
     const [step, setStep] = useState(0);
-    const [localMessage, setLocalMessage] = useState('');
     const [dragActive, setDragActive] = useState(false);
     const fileInputRef = useRef(null);
 
@@ -272,13 +270,12 @@ export default function CustomerMachrou3i({
 
     function submitApplication(event) {
         event.preventDefault();
-        setLocalMessage('');
 
         form.post('/backend/customer/machrou3i', {
             forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {
-                setLocalMessage(
+                toast.success(
                     'Application submitted to CIM. No funds were disbursed; a CIM advisor will review your dossier.',
                 );
                 setStep(0);
@@ -294,7 +291,7 @@ export default function CustomerMachrou3i({
             {
                 preserveScroll: true,
                 onSuccess: () =>
-                    setLocalMessage(
+                    toast.success(
                         'A CIM advisor will contact you to finalize the financing process. No funds were disbursed.',
                     ),
             },
@@ -308,7 +305,7 @@ export default function CustomerMachrou3i({
             {
                 preserveScroll: true,
                 onSuccess: () =>
-                    setLocalMessage(
+                    toast.success(
                         'Offer declined. No financing was disbursed.',
                     ),
             },
@@ -429,16 +426,6 @@ export default function CustomerMachrou3i({
                         totalRequested={totalRequested}
                         latestApplication={latestApplication}
                     />
-
-                    {(flash.success || localMessage) && (
-                        <motion.div
-                            className="mach-reveal rounded-2xl border border-emerald-300/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-700 dark:text-emerald-200"
-                            initial={{ scale: 0.98 }}
-                            animate={{ scale: 1 }}
-                        >
-                            {localMessage || flash.success}
-                        </motion.div>
-                    )}
 
                     <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                         <MetricCard

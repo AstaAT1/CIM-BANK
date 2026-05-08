@@ -202,6 +202,18 @@ export default function CimChatbot() {
     }, []);
 
     useEffect(() => {
+        function openFromDashboard() {
+            setIsOpen(true);
+        }
+
+        window.addEventListener('cim-chatbot:open', openFromDashboard);
+
+        return () => {
+            window.removeEventListener('cim-chatbot:open', openFromDashboard);
+        };
+    }, []);
+
+    useEffect(() => {
         if (!isOpen || !panelRef.current) {
             return undefined;
         }

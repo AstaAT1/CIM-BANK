@@ -27,7 +27,7 @@ export function UserMenuContent({ user }: Props) {
     return (
         <>
             {/* User identity header */}
-            <DropdownMenuLabel className="p-0 font-normal">
+            <DropdownMenuLabel className="p-0 font-normal [&_[data-slot=user-meta]_span:first-child]:text-white [&_[data-slot=user-meta]_span:last-child]:text-white/50">
                 <div className="flex items-center gap-2.5 px-3 py-2.5">
                     <UserInfo user={user} showEmail={true} />
                 </div>

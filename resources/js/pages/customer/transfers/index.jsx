@@ -474,16 +474,6 @@ export default function Transfers({
                         </div>
                     </section>
 
-                    {flash.success ? (
-                        <motion.div
-                            className="transfer-reveal rounded-2xl border border-emerald-300/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-700 dark:text-emerald-200"
-                            initial={{ scale: 0.98 }}
-                            animate={{ scale: 1 }}
-                        >
-                            {flash.success}
-                        </motion.div>
-                    ) : null}
-
                     {queryPrefill.amount || queryPrefill.beneficiaryId ? (
                         <div className="transfer-reveal rounded-2xl border border-[#D4A23C]/40 bg-[#D4A23C]/10 px-4 py-3 text-sm font-semibold text-[#061F39] dark:text-[#F5D58C]">
                             This transfer was prefilled for review. It will not

@@ -60,6 +60,15 @@ class CimBankingFlowTest extends TestCase
             ])
             ->assertRedirect(route('account.pending'));
 
+        $atm = $this->atm();
+
+        $this->actingAs($customer)
+            ->post("/backend/customer/atms/{$atm->id}/deposit", [
+                'bank_account_id' => 1,
+                'amount' => 100,
+            ])
+            ->assertRedirect(route('account.pending'));
+
         $this->actingAs($rejectedCustomer)
             ->get('/dashboard')
             ->assertRedirect(route('account.pending'));
@@ -137,17 +146,32 @@ class CimBankingFlowTest extends TestCase
             'note' => 'Dashboard test withdrawal',
         ]);
 
+        AccountTransaction::create([
+            'bank_account_id' => $account->id,
+            'reference' => 'DASHBOARD-ATM-DEPOSIT-001',
+            'type' => 'atm_deposit',
+            'direction' => 'in',
+            'amount' => 250,
+            'balance_after' => 1250,
+            'description' => 'ATM cash deposit at CIM Test ATM',
+            'status' => 'completed',
+            'performed_at' => now(),
+        ]);
+
         $this->actingAs($customer)
             ->get('/dashboard')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('dashboard')
-                ->where('account.account_number', $account->account_number)
-                ->where('account.rib', $account->rib)
+                ->where('account.account_number_last4', substr($account->account_number, -4))
+                ->where('account.rib_last4', substr($account->rib, -4))
                 ->where('account.balance', 1000)
                 ->where('card.masked_card_number', '**** **** **** 4242')
                 ->where('card.card_holder_name', 'Test Customer')
                 ->has('transactions', 2)
+                ->where('transactions.0.type', 'atm_deposit')
+                ->where('transactions.0.label', 'ATM Deposit')
+                ->where('transactions.0.direction', 'in')
             );
     }
 
@@ -234,6 +258,104 @@ class CimBankingFlowTest extends TestCase
         $this->assertSame(1, AtmWithdrawal::where('atm_id', $atm->id)->where('status', 'completed')->count());
         $this->assertSame(1, AtmCashMovement::where('atm_id', $atm->id)->where('type', 'withdrawal')->count());
         $this->assertSame(1, AccountTransaction::where('bank_account_id', $account->id)->where('type', 'withdrawal')->count());
+    }
+
+    public function test_verified_customer_can_deposit_cash_at_active_atm(): void
+    {
+        $customer = $this->customerWithProfile('verified');
+        $account = $this->bankAccount($customer, ['balance' => 1000]);
+        $atm = $this->atm(['current_cash' => 500, 'max_capacity' => 10000, 'status' => 'empty', 'is_active' => true]);
+
+        $this->actingAs($customer)
+            ->post("/backend/customer/atms/{$atm->id}/deposit", [
+                'bank_account_id' => $account->id,
+                'amount' => 1500,
+            ])
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $this->assertSame(2500.00, (float) $account->refresh()->balance);
+        $this->assertSame(2000.00, (float) $atm->refresh()->current_cash);
+        $this->assertSame('active', $atm->status);
+
+        $this->assertDatabaseHas('account_transactions', [
+            'bank_account_id' => $account->id,
+            'type' => 'atm_deposit',
+            'direction' => 'in',
+            'amount' => 1500,
+            'balance_after' => 2500,
+            'status' => 'completed',
+        ]);
+
+        $this->assertDatabaseHas('atm_cash_movements', [
+            'atm_id' => $atm->id,
+            'type' => 'deposit',
+            'amount' => 1500,
+            'cash_before' => 500,
+            'cash_after' => 2000,
+        ]);
+    }
+
+    public function test_atm_deposit_blocks_invalid_customer_account_amount_and_service_states(): void
+    {
+        $customer = $this->customerWithProfile('verified');
+        $otherCustomer = $this->customerWithProfile('verified');
+        $account = $this->bankAccount($customer, ['balance' => 1000]);
+        $otherAccount = $this->bankAccount($otherCustomer, ['balance' => 1000]);
+        $atm = $this->atm(['current_cash' => 500, 'status' => 'active', 'is_active' => true]);
+
+        $this->actingAs($customer)
+            ->post("/backend/customer/atms/{$atm->id}/deposit", [
+                'bank_account_id' => $account->id,
+                'amount' => 0,
+            ])
+            ->assertSessionHasErrors('amount');
+
+        $this->actingAs($customer)
+            ->post("/backend/customer/atms/{$atm->id}/deposit", [
+                'bank_account_id' => $account->id,
+                'amount' => 20000.01,
+            ])
+            ->assertSessionHasErrors('amount');
+
+        $this->actingAs($customer)
+            ->post("/backend/customer/atms/{$atm->id}/deposit", [
+                'bank_account_id' => $otherAccount->id,
+                'amount' => 100,
+            ])
+            ->assertSessionHasErrors('bank_account_id');
+
+        $account->update(['status' => 'closed']);
+
+        $this->actingAs($customer)
+            ->post("/backend/customer/atms/{$atm->id}/deposit", [
+                'bank_account_id' => $account->id,
+                'amount' => 100,
+            ])
+            ->assertSessionHasErrors('bank_account_id');
+
+        $account->update(['status' => 'active']);
+        $atm->update(['is_active' => false, 'status' => 'out_of_service']);
+
+        $this->actingAs($customer)
+            ->post("/backend/customer/atms/{$atm->id}/deposit", [
+                'bank_account_id' => $account->id,
+                'amount' => 100,
+            ])
+            ->assertSessionHasErrors('atm_id');
+
+        $this->actingAs($customer)
+            ->post('/backend/customer/atm-withdrawals', [
+                'atm_id' => $atm->id,
+                'bank_account_id' => $account->id,
+                'amount' => 100,
+            ])
+            ->assertSessionHasErrors('atm_id');
+
+        $this->assertSame(1000.00, (float) $account->refresh()->balance);
+        $this->assertSame(500.00, (float) $atm->refresh()->current_cash);
+        $this->assertSame(0, AtmCashMovement::where('type', 'deposit')->count());
+        $this->assertSame(0, AccountTransaction::where('type', 'atm_deposit')->count());
     }
 
     public function test_atm_withdrawal_blocks_invalid_cash_balance_and_service_states(): void

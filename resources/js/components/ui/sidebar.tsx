@@ -162,7 +162,7 @@ function Sidebar({
       <div
         data-slot="sidebar"
         className={cn(
-          "relative flex h-full w-(--sidebar-width) flex-col overflow-hidden border-r border-white/10 bg-[#061F39] text-white shadow-[18px_0_70px_rgba(6,31,57,0.18)] before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_0%_0%,rgba(212,162,60,0.18),transparent_34%),radial-gradient(circle_at_100%_20%,rgba(10,100,116,0.28),transparent_38%)] before:content-['']",
+          "relative flex h-full w-(--sidebar-width) flex-col overflow-hidden border-r border-[#D1D9DA] bg-white text-[#061F39] shadow-[18px_0_70px_rgba(6,31,57,0.1)] before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_0%_0%,rgba(212,162,60,0.1),transparent_34%),radial-gradient(circle_at_100%_20%,rgba(10,100,116,0.1),transparent_38%)] before:content-[''] dark:border-white/10 dark:bg-[#061F39] dark:text-white dark:shadow-[18px_0_70px_rgba(6,31,57,0.18)] dark:before:bg-[radial-gradient(circle_at_0%_0%,rgba(212,162,60,0.18),transparent_34%),radial-gradient(circle_at_100%_20%,rgba(10,100,116,0.28),transparent_38%)]",
           className
         )}
         {...props}
@@ -183,7 +183,7 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="w-(--sidebar-width) overflow-hidden border-r border-white/10 bg-[#061F39] p-0 text-white shadow-2xl [&>button]:hidden"
+          className="w-(--sidebar-width) overflow-hidden border-r border-[#D1D9DA] bg-white p-0 text-[#061F39] shadow-2xl dark:border-white/10 dark:bg-[#061F39] dark:text-white [&>button]:hidden"
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -191,7 +191,7 @@ function Sidebar({
           }
           side={side}
         >
-          <div className="relative flex h-full w-full flex-col overflow-hidden before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_0%_0%,rgba(212,162,60,0.18),transparent_34%),radial-gradient(circle_at_100%_20%,rgba(10,100,116,0.28),transparent_38%)] before:content-['']">
+          <div className="relative flex h-full w-full flex-col overflow-hidden before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_0%_0%,rgba(212,162,60,0.1),transparent_34%),radial-gradient(circle_at_100%_20%,rgba(10,100,116,0.1),transparent_38%)] before:content-[''] dark:before:bg-[radial-gradient(circle_at_0%_0%,rgba(212,162,60,0.18),transparent_34%),radial-gradient(circle_at_100%_20%,rgba(10,100,116,0.28),transparent_38%)]">
             <div className="relative z-10 flex min-h-0 flex-1 flex-col">
               {children}
             </div>
@@ -203,7 +203,7 @@ function Sidebar({
 
   return (
     <div
-      className="group peer hidden text-white md:block"
+      className="group peer hidden text-[#061F39] dark:text-white md:block"
       data-state={state}
       data-collapsible={state === "collapsed" ? collapsible : ""}
       data-variant={variant}
@@ -237,8 +237,8 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           className={cn(
-            "relative flex h-full w-full flex-col overflow-hidden bg-[#061F39] text-white shadow-[18px_0_70px_rgba(6,31,57,0.22)] before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_0%_0%,rgba(212,162,60,0.18),transparent_34%),radial-gradient(circle_at_100%_18%,rgba(10,100,116,0.28),transparent_38%)] before:content-['']",
-            "group-data-[variant=floating]:rounded-[1.45rem] group-data-[variant=floating]:border group-data-[variant=floating]:border-white/10",
+            "relative flex h-full w-full flex-col overflow-hidden bg-white text-[#061F39] shadow-[18px_0_70px_rgba(6,31,57,0.12)] before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_0%_0%,rgba(212,162,60,0.1),transparent_34%),radial-gradient(circle_at_100%_18%,rgba(10,100,116,0.1),transparent_38%)] before:content-[''] dark:bg-[#061F39] dark:text-white dark:shadow-[18px_0_70px_rgba(6,31,57,0.22)] dark:before:bg-[radial-gradient(circle_at_0%_0%,rgba(212,162,60,0.18),transparent_34%),radial-gradient(circle_at_100%_18%,rgba(10,100,116,0.28),transparent_38%)]",
+            "group-data-[variant=floating]:rounded-[1.45rem] group-data-[variant=floating]:border group-data-[variant=floating]:border-[#D1D9DA] dark:group-data-[variant=floating]:border-white/10",
             "after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-px after:bg-gradient-to-b after:from-transparent after:via-[#D4A23C]/30 after:to-transparent after:content-['']"
           )}
         >
@@ -484,14 +484,14 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-3 overflow-hidden rounded-2xl p-3 text-left text-sm font-medium outline-hidden ring-[#D4A23C]/35 transition-[width,height,padding,background-color,color,box-shadow,transform] duration-200 focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-[#D4A23C]/16 data-[active=true]:font-semibold data-[active=true]:text-white data-[active=true]:shadow-[inset_0_0_0_1px_rgba(212,162,60,0.34),0_12px_34px_rgba(0,0,0,0.18)] data-[state=open]:hover:bg-white/10 data-[state=open]:hover:text-white group-data-[collapsible=icon]:size-11! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg]:size-4.5 [&>svg]:shrink-0 [&>svg]:text-[#D4A23C]",
+  "peer/menu-button flex w-full items-center gap-3 overflow-hidden rounded-2xl p-3 text-left text-sm font-medium outline-hidden ring-[#D4A23C]/35 transition-[width,height,padding,background-color,color,box-shadow,transform] duration-200 focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-[#D4A23C]/16 data-[active=true]:font-semibold data-[active=true]:text-[#061F39] data-[active=true]:shadow-[inset_0_0_0_1px_rgba(212,162,60,0.34),0_12px_34px_rgba(6,31,57,0.08)] dark:data-[active=true]:text-white dark:data-[active=true]:shadow-[inset_0_0_0_1px_rgba(212,162,60,0.34),0_12px_34px_rgba(0,0,0,0.18)] data-[state=open]:hover:bg-[#082F54]/7 data-[state=open]:hover:text-[#061F39] dark:data-[state=open]:hover:bg-white/10 dark:data-[state=open]:hover:text-white group-data-[collapsible=icon]:size-11! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg]:size-4.5 [&>svg]:shrink-0 [&>svg]:text-[#D4A23C]",
   {
     variants: {
       variant: {
         default:
-          "text-white/72 hover:-translate-y-0.5 hover:bg-white/10 hover:text-white active:bg-white/10 active:text-white",
+          "text-slate-600 hover:-translate-y-0.5 hover:bg-[#082F54]/7 hover:text-[#061F39] active:bg-[#082F54]/7 active:text-[#061F39] dark:text-white/72 dark:hover:bg-white/10 dark:hover:text-white dark:active:bg-white/10 dark:active:text-white",
         outline:
-          "bg-white/5 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12)] hover:-translate-y-0.5 hover:bg-white/10 hover:text-white",
+          "bg-[#F7F8FA] text-[#061F39] shadow-[inset_0_0_0_1px_rgba(209,217,218,0.8)] hover:-translate-y-0.5 hover:bg-white hover:text-[#061F39] dark:bg-white/5 dark:text-white dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12)] dark:hover:bg-white/10 dark:hover:text-white",
       },
       size: {
         default: "h-11 text-sm",

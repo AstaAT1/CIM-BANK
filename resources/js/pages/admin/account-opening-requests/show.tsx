@@ -1,4 +1,5 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import CimFeedbackModal from '@/components/cim-feedback-modal';
 import {
     AlertTriangle,
     ArrowLeft,
@@ -208,6 +209,19 @@ export default function AccountOpeningRequestShow() {
     const [rejectionReason, setRejectionReason] = useState('');
     const [rejectBusy, setRejectBusy] = useState(false);
     const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+    const [feedback, setFeedback] = useState<{
+        open: boolean;
+        type: 'warning' | 'confirm';
+        title: string;
+        message: string;
+        confirmLabel?: string;
+        onConfirm?: () => void;
+    }>({
+        open: false,
+        type: 'warning',
+        title: '',
+        message: '',
+    });
 
     const cinFront = documents.find((document) => document.document_type === 'cin_front');
     const cinBack = documents.find((document) => document.document_type === 'cin_back');
@@ -231,36 +245,52 @@ export default function AccountOpeningRequestShow() {
     );
 
     const handleApprove = () => {
-        if (
-            !confirm(
-                'Approve this request? This will verify the client, create their bank account and card.',
-            )
-        ) {
-            return;
-        }
-
-        router.post(
-            `/admin/account-opening-requests/${aor.id}/approve`,
-            {},
-            { preserveScroll: true },
-        );
+        setFeedback({
+            open: true,
+            type: 'confirm',
+            title: 'Approve account opening?',
+            message:
+                'This will verify the client, create their bank account and issue their card.',
+            confirmLabel: 'Approve request',
+            onConfirm: () => {
+                setFeedback((current) => ({ ...current, open: false }));
+                router.post(
+                    `/admin/account-opening-requests/${aor.id}/approve`,
+                    {},
+                    { preserveScroll: true },
+                );
+            },
+        });
     };
 
     const handleMarkUnderReview = () => {
-        if (!confirm('Mark this request as under review?')) {
-            return;
-        }
-
-        router.post(
-            `/admin/account-opening-requests/${aor.id}/under-review`,
-            {},
-            { preserveScroll: true },
-        );
+        setFeedback({
+            open: true,
+            type: 'confirm',
+            title: 'Mark request under review?',
+            message:
+                'The request status will change so the team knows this dossier is actively being handled.',
+            confirmLabel: 'Mark under review',
+            onConfirm: () => {
+                setFeedback((current) => ({ ...current, open: false }));
+                router.post(
+                    `/admin/account-opening-requests/${aor.id}/under-review`,
+                    {},
+                    { preserveScroll: true },
+                );
+            },
+        });
     };
 
     const handleReject = () => {
         if (!rejectionReason.trim()) {
-            alert('Please enter a rejection reason.');
+            setFeedback({
+                open: true,
+                type: 'warning',
+                title: 'Rejection reason required',
+                message: 'Please enter a rejection reason before continuing.',
+                confirmLabel: 'Close',
+            });
 
             return;
         }
@@ -328,6 +358,17 @@ export default function AccountOpeningRequestShow() {
     return (
         <>
             <Head title={`Request ${aor.request_number} — CIM Admin`} />
+            <CimFeedbackModal
+                open={feedback.open}
+                type={feedback.type}
+                title={feedback.title}
+                message={feedback.message}
+                confirmLabel={feedback.confirmLabel}
+                onConfirm={feedback.onConfirm}
+                onClose={() =>
+                    setFeedback((current) => ({ ...current, open: false }))
+                }
+            />
 
             {lightboxSrc && (
                 <motion.div
@@ -426,26 +467,6 @@ export default function AccountOpeningRequestShow() {
                         <ArrowLeft className="h-4 w-4" />
                         Back to all requests
                     </Link>
-
-                    {flash?.success && (
-                        <motion.div
-                            className="aor-show-reveal rounded-2xl border border-emerald-300/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-700 dark:text-emerald-200"
-                            initial={{ scale: 0.98 }}
-                            animate={{ scale: 1 }}
-                        >
-                            {flash.success}
-                        </motion.div>
-                    )}
-
-                    {flash?.error && (
-                        <motion.div
-                            className="aor-show-reveal rounded-2xl border border-rose-300/30 bg-rose-500/10 px-4 py-3 text-sm font-semibold text-rose-700 dark:text-rose-200"
-                            initial={{ scale: 0.98 }}
-                            animate={{ scale: 1 }}
-                        >
-                            {flash.error}
-                        </motion.div>
-                    )}
 
                     <Hero
                         aor={aor}

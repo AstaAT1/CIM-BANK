@@ -24,6 +24,7 @@ import type { ComponentType, ReactNode } from 'react';
 import { motion } from 'motion/react';
 import gsap from 'gsap';
 import TextLink from '@/components/text-link';
+import ThemeToggle from '@/components/theme-toggle';
 import { login } from '@/routes';
 import background from '../customer/images/CIM.png';
 
@@ -273,18 +274,22 @@ export default function Register({ branches }: { branches?: Branch[] }) {
 
             <main
                 ref={pageRef}
-                className="relative h-svh overflow-hidden bg-[#061F39] text-white"
+                className="relative h-svh overflow-hidden bg-[#F7F8FA] text-[#061F39] dark:bg-[#061F39] dark:text-white"
             >
+                <div className="fixed top-5 right-5 z-50">
+                    <ThemeToggle />
+                </div>
+
                 <div className="absolute inset-0">
                     <img
                         src={background}
                         alt="CIM Bank"
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-cover opacity-[0.08] dark:opacity-100"
                     />
 
-                    <div className="absolute inset-0 bg-[#061F39]/60" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#061F39]/94 via-[#061F39]/66 to-[#061F39]/30" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#061F39]/78 via-transparent to-[#061F39]/20" />
+                    <div className="absolute inset-0 bg-[#F7F8FA]/80 dark:bg-[#061F39]/60" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#F7F8FA]/96 via-white/84 to-[#F7F8FA]/68 dark:from-[#061F39]/94 dark:via-[#061F39]/66 dark:to-[#061F39]/30" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#F7F8FA]/82 via-transparent to-white/40 dark:from-[#061F39]/78 dark:via-transparent dark:to-[#061F39]/20" />
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(212,162,60,0.25),transparent_28%),radial-gradient(circle_at_88%_18%,rgba(10,100,116,0.22),transparent_34%)]" />
                 </div>
 
@@ -304,11 +309,11 @@ export default function Register({ branches }: { branches?: Branch[] }) {
                             Digital onboarding
                         </div>
 
-                        <h1 className="mt-6 max-w-3xl text-5xl font-semibold leading-[0.95] tracking-tight text-white xl:text-6xl">
+                        <h1 className="mt-6 max-w-3xl text-5xl font-semibold leading-[0.95] tracking-tight text-[#061F39] dark:text-white xl:text-6xl">
                             Open your CIM account with confidence.
                         </h1>
 
-                        <p className="mt-5 max-w-xl text-base leading-8 text-white/72">
+                        <p className="mt-5 max-w-xl text-base leading-8 text-slate-600 dark:text-white/72">
                             Submit your contact details, verify your identity,
                             choose a branch, and start your secure CIM banking
                             journey.
@@ -318,7 +323,7 @@ export default function Register({ branches }: { branches?: Branch[] }) {
                             {benefits.map((item) => (
                                 <span
                                     key={item}
-                                    className="rounded-full border border-white/12 bg-white/10 px-4 py-2 text-xs font-semibold text-white/82 backdrop-blur-xl"
+                                    className="rounded-full border border-[#D1D9DA]/80 bg-white/70 px-4 py-2 text-xs font-semibold text-slate-600 backdrop-blur-xl dark:border-white/12 dark:bg-white/10 dark:text-white/82"
                                 >
                                     {item}
                                 </span>
@@ -354,11 +359,11 @@ export default function Register({ branches }: { branches?: Branch[] }) {
                         </div>
 
                         <motion.div
-                            className="overflow-hidden rounded-[1.75rem] border border-white/14 bg-white/[0.13] shadow-[0_30px_100px_rgba(0,0,0,0.32)] backdrop-blur-2xl"
+                            className="overflow-hidden rounded-[1.75rem] border border-[#D1D9DA]/80 bg-white/88 text-[#061F39] shadow-[0_30px_90px_rgba(6,31,57,0.12)] backdrop-blur-2xl dark:border-white/14 dark:bg-white/[0.13] dark:text-white dark:shadow-[0_30px_100px_rgba(0,0,0,0.32)]"
                             whileHover={{ y: -2 }}
                             transition={{ duration: 0.22 }}
                         >
-                            <div className="border-b border-white/10 px-5 py-4 sm:px-7">
+                            <div className="border-b border-[#D1D9DA]/70 px-5 py-4 dark:border-white/10 sm:px-7">
                                 <div className="hidden lg:block">
                                     <img
                                         src="/logo_twil.png"
@@ -374,11 +379,11 @@ export default function Register({ branches }: { branches?: Branch[] }) {
                                             Step {step} of 3
                                         </div>
 
-                                        <h2 className="mt-3 text-2xl font-semibold tracking-tight text-white">
+                                        <h2 className="mt-3 text-2xl font-semibold tracking-tight text-[#061F39] dark:text-white">
                                             {currentStep.title}
                                         </h2>
 
-                                        <p className="mt-1 text-sm leading-6 text-white/62">
+                                        <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-white/62">
                                             {currentStep.description}
                                         </p>
                                     </div>
@@ -634,7 +639,7 @@ export default function Register({ branches }: { branches?: Branch[] }) {
                                         <button
                                             type="button"
                                             onClick={prevStep}
-                                            className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-white/12 bg-white/[0.08] px-5 text-sm font-semibold text-white/78 transition hover:bg-white/[0.12]"
+                                            className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-[#D1D9DA]/80 bg-white px-5 text-sm font-semibold text-[#082F54] transition hover:border-[#D4A23C] hover:bg-[#F7F8FA] dark:border-white/12 dark:bg-white/[0.08] dark:text-white/78 dark:hover:bg-white/[0.12]"
                                         >
                                             <ArrowLeft className="h-4 w-4" />
                                             Back
@@ -666,11 +671,11 @@ export default function Register({ branches }: { branches?: Branch[] }) {
                                     )}
                                 </div>
 
-                                <div className="mt-4 rounded-2xl border border-white/12 bg-white/[0.08] px-4 py-3 text-center text-sm text-white/65">
+                                <div className="mt-4 rounded-2xl border border-[#D1D9DA]/80 bg-[#F7F8FA]/85 px-4 py-3 text-center text-sm text-slate-600 dark:border-white/12 dark:bg-white/[0.08] dark:text-white/65">
                                     Already have an account?{' '}
                                     <TextLink
                                         href={login()}
-                                        className="font-bold text-[#F6D27B] hover:text-white"
+                                        className="font-bold text-[#0A6474] hover:text-[#D4A23C] dark:text-[#F6D27B] dark:hover:text-white"
                                     >
                                         Log in
                                     </TextLink>
@@ -678,7 +683,7 @@ export default function Register({ branches }: { branches?: Branch[] }) {
                             </form>
                         </motion.div>
 
-                        <p className="register-reveal mt-3 text-center text-xs leading-6 text-white/58">
+                        <p className="register-reveal mt-3 text-center text-xs leading-6 text-slate-500 dark:text-white/58">
                             Your request is reviewed by CIM staff before account
                             activation.
                         </p>
@@ -704,7 +709,7 @@ function StepIndicator({ current }: { current: number }) {
                                 ? 'border-[#D4A23C]/60 bg-[#D4A23C]/12'
                                 : done
                                   ? 'border-emerald-300/25 bg-emerald-400/10'
-                                  : 'border-white/12 bg-white/[0.06]'
+                                  : 'border-[#D1D9DA]/80 bg-white/60 dark:border-white/12 dark:bg-white/[0.06]'
                         }`}
                     >
                         <div className="flex items-center gap-2">
@@ -714,7 +719,7 @@ function StepIndicator({ current }: { current: number }) {
                                         ? 'bg-[#D4A23C] text-[#061F39]'
                                         : done
                                           ? 'bg-emerald-400 text-[#061F39]'
-                                          : 'bg-white/10 text-white/50'
+                                          : 'bg-[#F7F8FA] text-slate-400 dark:bg-white/10 dark:text-white/50'
                                 }`}
                             >
                                 {done ? '✓' : number}
@@ -725,7 +730,7 @@ function StepIndicator({ current }: { current: number }) {
                                         ? 'text-[#F6D27B]'
                                         : done
                                           ? 'text-emerald-100'
-                                          : 'text-white/42'
+                                          : 'text-slate-400 dark:text-white/42'
                                 }`}
                             >
                                 {label}
@@ -751,7 +756,7 @@ function CimField({
 }) {
     return (
         <label className="block">
-            <span className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold tracking-[0.12em] text-white/64 uppercase">
+            <span className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase dark:text-white/64">
                 {Icon ? <Icon className="h-3.5 w-3.5 text-[#F6D27B]" /> : null}
                 {label}
             </span>
@@ -769,7 +774,7 @@ function CimInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
     return (
         <input
             {...props}
-            className={`h-10 w-full rounded-2xl border border-white/14 bg-white/12 px-3 text-sm font-semibold text-white outline-none transition placeholder:text-white/36 focus:border-[#D4A23C]/70 focus:bg-white/[0.16] focus:ring-4 focus:ring-[#D4A23C]/15 ${props.className ?? ''}`}
+            className={`h-10 w-full rounded-2xl border border-[#D1D9DA] bg-white px-3 text-sm font-semibold text-[#061F39] outline-none transition placeholder:text-slate-400 focus:border-[#D4A23C]/70 focus:bg-white focus:ring-4 focus:ring-[#D4A23C]/15 dark:border-white/14 dark:bg-white/12 dark:text-white dark:placeholder:text-white/36 dark:focus:bg-white/[0.16] ${props.className ?? ''}`}
         />
     );
 }
@@ -789,16 +794,15 @@ function CimSelect({
         <select
             value={value}
             onChange={onChange}
-            className="h-10 w-full rounded-2xl border border-white/14 bg-white/12 px-3 text-sm font-semibold text-white outline-none transition focus:border-[#D4A23C]/70 focus:bg-white/[0.16] focus:ring-4 focus:ring-[#D4A23C]/15"
+            className="h-10 w-full rounded-2xl border border-[#D1D9DA] bg-white px-3 text-sm font-semibold text-[#061F39] outline-none transition focus:border-[#D4A23C]/70 focus:bg-white focus:ring-4 focus:ring-[#D4A23C]/15 dark:border-white/14 dark:bg-white/12 dark:text-white dark:focus:bg-white/[0.16]"
         >
-            <option value="" disabled className="bg-[#061F39] text-white/60">
+            <option value="" disabled>
                 {placeholder}
             </option>
             {options.map((option) => (
                 <option
                     key={option.value}
                     value={option.value}
-                    className="bg-[#061F39] text-white"
                 >
                     {option.label}
                 </option>
@@ -815,7 +819,7 @@ function CimFileInput({
     onChange: (file: File | null) => void;
 }) {
     return (
-        <label className="flex h-20 cursor-pointer items-center justify-center rounded-2xl border border-dashed border-white/18 bg-white/[0.08] px-3 text-center transition hover:border-[#D4A23C]/60 hover:bg-white/[0.12]">
+        <label className="flex h-20 cursor-pointer items-center justify-center rounded-2xl border border-dashed border-[#D1D9DA] bg-white/70 px-3 text-center transition hover:border-[#D4A23C]/60 hover:bg-white dark:border-white/18 dark:bg-white/[0.08] dark:hover:bg-white/[0.12]">
             <input
                 type="file"
                 accept="image/*"
@@ -826,14 +830,14 @@ function CimFileInput({
             {file ? (
                 <div>
                     <CheckCircle2 className="mx-auto mb-1 h-5 w-5 text-[#F6D27B]" />
-                    <p className="max-w-[170px] truncate text-xs font-semibold text-white/80">
+                    <p className="max-w-[170px] truncate text-xs font-semibold text-slate-600 dark:text-white/80">
                         {file.name}
                     </p>
                 </div>
             ) : (
                 <div>
                     <UploadCloud className="mx-auto mb-1 h-5 w-5 text-[#F6D27B]" />
-                    <p className="text-xs font-semibold text-white/58">
+                    <p className="text-xs font-semibold text-slate-500 dark:text-white/58">
                         Upload image
                     </p>
                 </div>
@@ -852,10 +856,10 @@ function TrustCard({
     text: string;
 }) {
     return (
-        <div className="rounded-2xl border border-white/12 bg-white/10 p-4 backdrop-blur-xl">
+        <div className="rounded-2xl border border-[#D1D9DA]/75 bg-white/70 p-4 backdrop-blur-xl dark:border-white/12 dark:bg-white/10">
             <Icon className="mb-3 h-5 w-5 text-[#F6D27B]" />
-            <p className="text-sm font-semibold text-white">{title}</p>
-            <p className="mt-1 text-xs text-white/55">{text}</p>
+            <p className="text-sm font-semibold text-[#061F39] dark:text-white">{title}</p>
+            <p className="mt-1 text-xs text-slate-500 dark:text-white/55">{text}</p>
         </div>
     );
 }
