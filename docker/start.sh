@@ -5,6 +5,10 @@ set -e
 PORT_TO_USE="${PORT:-8080}"
 sed -i "s/listen 8080;/listen ${PORT_TO_USE};/g" /etc/nginx/http.d/default.conf
 
+echo "Allowing PHP-FPM to read Railway environment variables..."
+sed -i 's/^;*clear_env = .*/clear_env = no/' /usr/local/etc/php-fpm.d/www.conf || true
+grep -q "^clear_env = no" /usr/local/etc/php-fpm.d/www.conf || echo "clear_env = no" >> /usr/local/etc/php-fpm.d/www.conf
+
 echo "Fixing Laravel storage permissions..."
 mkdir -p storage/logs storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
 touch storage/logs/laravel.log
