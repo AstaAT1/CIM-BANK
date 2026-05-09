@@ -27,6 +27,12 @@ php artisan migrate --force
 echo "Linking storage..."
 php artisan storage:link || true
 
-echo "Starting PHP-FPM and Nginx..."
+echo "Starting PHP-FPM..."
 php-fpm -D
+
+echo "Checking PHP-FPM port..."
+sleep 2
+netstat -tulpn | grep 9000 || true
+
+echo "Starting Nginx..."
 nginx -g "daemon off;"
