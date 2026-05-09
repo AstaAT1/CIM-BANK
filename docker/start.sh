@@ -21,6 +21,9 @@ php artisan tinker --execute="echo 'DB=' . config('database.default') . PHP_EOL;
 echo "Running migrations..."
 php artisan migrate --force
 
+echo "Seeding production demo data..."
+php artisan db:seed --force || true
+
 echo "Linking storage..."
 php artisan storage:link || true
 
