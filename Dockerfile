@@ -2,15 +2,18 @@ FROM php:8.3-fpm-alpine
 
 WORKDIR /var/www/html
 
-RUN apk add --no-cache \
+
+    RUN apk add --no-cache \
     nginx \
     bash \
     curl \
+    curl-dev \
     git \
     unzip \
     nodejs \
     npm \
     postgresql-dev \
+    sqlite-dev \
     libzip-dev \
     libpng-dev \
     icu-dev \
@@ -22,12 +25,15 @@ RUN apk add --no-cache \
     && docker-php-ext-install \
         pdo \
         pdo_pgsql \
+        pdo_sqlite \
         mbstring \
         zip \
         bcmath \
         intl \
         gd \
-        pcntl
+        pcntl \
+        curl \
+        exif
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
