@@ -5,6 +5,12 @@ set -e
 PORT_TO_USE="${PORT:-8080}"
 sed -i "s/listen 8080;/listen ${PORT_TO_USE};/g" /etc/nginx/http.d/default.conf
 
+echo "Fixing Laravel storage permissions..."
+mkdir -p storage/logs storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
+touch storage/logs/laravel.log
+chown -R www-data:www-data storage bootstrap/cache
+chmod -R 775 storage bootstrap/cache
+
 echo "Clearing Laravel caches..."
 php artisan optimize:clear || true
 php artisan config:clear || true
