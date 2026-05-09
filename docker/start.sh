@@ -22,7 +22,7 @@ echo "Running migrations..."
 php artisan migrate --force
 
 echo "Seeding production demo data..."
-php artisan db:seed --force || true
+php artisan db:seed --class=ProductionDemoSeeder --force || true
 
 echo "Linking storage..."
 php artisan storage:link || true
