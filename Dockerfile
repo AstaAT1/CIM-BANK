@@ -41,7 +41,7 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi \
+RUN if [ -f package-lock.json ]; then npm ci --include-workspace-root --install-links; else npm install --include-workspace-root --install-links; fi \
     && npm run build
 
 RUN chown -R www-data:www-data storage bootstrap/cache public \
