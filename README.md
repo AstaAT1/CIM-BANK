@@ -196,6 +196,26 @@ Command:
 ```bash
 php artisan exchange-rates:fetch
 
+## 🌐 Live Demo
+
+You can test CIM Bank directly online without installation:
+
+👉 https://cim-bank-production.up.railway.app
+
+### 🧪 Testing Tips
+
+- Use a **demo account** or create a new one
+- Complete onboarding to access full features
+- Test core modules:
+  - ATM withdrawals & deposits
+  - Internal transfers
+  - Bills & AutoPay
+  - Machrou3i application
+- Admin features require a seeded/admin account
+
+⚠️ Note:
+This is a demo environment. Data may be reset periodically.
+
 ## 🔑 Demo Accounts
 | Role | Email | Password |
  | Role | -----------------Email--------------------------- | Password |
